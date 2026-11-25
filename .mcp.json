@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gleam_packages": {
+      "type": "http",
+      "url": "https://gleam-package-mcp.renata-amutio.workers.dev/"
+    }
+  }
+}
