@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Erlang and Gleam
         uses: erlef/setup-beam@v1
@@ -44,7 +44,7 @@ jobs:
 
       - name: Configure Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Build the site
         run: gleam run build
@@ -53,10 +53,10 @@ jobs:
           CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_TOKEN }}
 
       - name: Upload the site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
