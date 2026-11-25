@@ -14,6 +14,8 @@ pub type Error {
   ContentCouldNotBeRead(path: String, reason: simplifile.FileError)
   ContentMissingFrontMatter(path: String)
   ContentInvalidFrontMatter(path: String, reason: tom.ParseError)
+  ContentInvalidToml(path: String, reason: tom.ParseError)
+  ContentUnexpectedFile(path: String)
   ContentMissingField(path: String, field: String)
   ContentInvalidField(path: String, field: String, expected: String)
   ContentMissingTranslation(path: String)
@@ -39,6 +41,11 @@ pub fn to_string(error: Error) -> String {
       path <> " must start with front matter between two `+++` lines."
     ContentInvalidFrontMatter(path:, reason:) ->
       path <> " has invalid front matter: " <> parse_error_to_string(reason)
+    ContentInvalidToml(path:, reason:) ->
+      path <> " is not valid TOML: " <> parse_error_to_string(reason)
+    ContentUnexpectedFile(path:) ->
+      path
+      <> " is not named <name>.sv.md or <name>.en.md, so it would not appear on the site."
     ContentMissingField(path:, field:) ->
       path <> " is missing the required field `" <> field <> "`."
     ContentInvalidField(path:, field:, expected:) ->

@@ -80,3 +80,25 @@ pub fn read_collection_pairs_translations_test() {
   assert entry.read_collection(directory)
     == Error(error.ContentMissingSwedish(directory <> "/c.en.md"))
 }
+
+pub fn misnamed_files_fail_the_build_test() -> Nil {
+  let directory = "build/test-content/misnamed"
+  let _ = simplifile.delete(directory)
+  let assert Ok(_) = simplifile.create_directory_all(directory)
+  let assert Ok(_) = simplifile.write(directory <> "/a.sv.md", concert)
+  let assert Ok(_) = simplifile.write(directory <> "/.DS_Store", "")
+  let assert Ok([_]) = entry.read_collection(directory)
+
+  let assert Ok(_) = simplifile.write(directory <> "/b.md", concert)
+  assert entry.read_collection(directory)
+    == Error(error.ContentUnexpectedFile(directory <> "/b.md"))
+}
+
+pub fn data_files_report_toml_errors_test() -> Nil {
+  let path = "build/test-content/broken.toml"
+  let assert Ok(_) = simplifile.create_directory_all("build/test-content")
+  let assert Ok(_) = simplifile.write(path, "email = ")
+  let assert Error(error.ContentInvalidToml(path: reported, ..)) =
+    entry.read_data(path)
+  assert reported == path
+}

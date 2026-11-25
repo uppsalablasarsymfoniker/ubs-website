@@ -69,7 +69,7 @@ pub fn read_data(path: String) -> Result(Entry, Error) {
   )
   use fields <- result.try(
     tom.parse(source)
-    |> result.map_error(error.ContentInvalidFrontMatter(path, _)),
+    |> result.map_error(error.ContentInvalidToml(path, _)),
   )
 
   Ok(Entry(path:, fields:, body: ""))
@@ -86,23 +86,39 @@ pub fn read_translated(
   let english_path = path(directory, name, language.English)
   use english <- result.try(case simplifile.is_file(english_path) {
     Ok(True) -> read(english_path)
-    Ok(False) | Error(_) -> Error(error.ContentMissingTranslation(english_path))
+    Ok(False) -> Error(error.ContentMissingTranslation(english_path))
+    Error(reason) -> Error(error.ContentCouldNotBeRead(english_path, reason))
   })
 
   Ok(language.Translated(swedish:, english:))
 }
 
 /// Read every entry in a collection folder. Each entry needs a Swedish file;
-/// the English one is optional.
+/// the English one is optional. Any other file, such as `concert.md`, is an
+/// error rather than silently left off the site. Hidden files are ignored.
 ///
 pub fn read_collection(directory: String) -> Result(List(Translations), Error) {
   use files <- result.try(
     simplifile.read_directory(directory)
     |> result.map_error(error.ContentCouldNotBeListed(directory, _)),
   )
-  let names = list.filter(files, string.ends_with(_, ".md"))
-  let swedish = slugs(names, language.Swedish)
-  let english = slugs(names, language.English)
+  let files = list.filter(files, fn(file) { !string.starts_with(file, ".") })
+  let swedish = slugs(files, language.Swedish)
+  let english = slugs(files, language.English)
+
+  use _ <- result.try(
+    list.try_each(files, fn(file) {
+      case
+        list.any(language.all, fn(language) {
+          string.ends_with(file, suffix(language))
+        })
+      {
+        True -> Ok(Nil)
+        False ->
+          Error(error.ContentUnexpectedFile(filepath.join(directory, file)))
+      }
+    }),
+  )
 
   use _ <- result.try(
     list.try_each(english, fn(slug) {
@@ -132,8 +148,12 @@ fn path(directory: String, name: String, language: Language) -> String {
   filepath.join(directory, name <> "." <> language.code(language) <> ".md")
 }
 
+fn suffix(language: Language) -> String {
+  "." <> language.code(language) <> ".md"
+}
+
 fn slugs(files: List(String), language: Language) -> List(String) {
-  let suffix = "." <> language.code(language) <> ".md"
+  let suffix = suffix(language)
   list.filter_map(files, fn(file) {
     case string.ends_with(file, suffix) {
       True -> Ok(string.drop_end(file, string.length(suffix)))
