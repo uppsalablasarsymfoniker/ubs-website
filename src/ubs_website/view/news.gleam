@@ -40,7 +40,7 @@ pub fn detail_view(
     )
 
   [
-    html.article([document.lang_if_different(language, text_language)], [
+    html.article([], [
       html.p([attribute.class("mb-4")], [
         html.a(
           [
@@ -59,9 +59,13 @@ pub fn detail_view(
       html.p([attribute.class("label-type mb-2 text-primary")], [
         date.view(item.date, language),
       ]),
-      html.h1([attribute.class("mb-6 text-h1 font-bold")], [
-        html.text(text.title),
-      ]),
+      html.h1(
+        [
+          attribute.class("mb-6 text-h1 font-bold"),
+          document.lang_if_different(language, text_language),
+        ],
+        [html.text(text.title)],
+      ),
       document.fallback_notice(language, text_language),
       case item.image {
         Some(image) ->
@@ -72,7 +76,10 @@ pub fn detail_view(
           ])
         None -> element.none()
       },
-      document.prose(text.body),
+      document.prose(
+        [document.lang_if_different(language, text_language)],
+        text.body,
+      ),
     ]),
   ]
 }

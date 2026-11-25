@@ -66,8 +66,16 @@ pub fn view(
 
 /// Markdown rendered to HTML, styled by the `prose` utility.
 ///
-pub fn prose(html: String) -> Element(a) {
-  element.unsafe_raw_html("", "div", [attribute.class("prose")], html)
+pub fn prose(
+  attributes: List(attribute.Attribute(a)),
+  html: String,
+) -> Element(a) {
+  element.unsafe_raw_html(
+    "",
+    "div",
+    [attribute.class("prose"), ..attributes],
+    html,
+  )
 }
 
 /// The page title shown in the browser tab and in link previews.

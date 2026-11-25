@@ -93,7 +93,7 @@ pub fn detail_view(
     )
 
   [
-    html.article([document.lang_if_different(language, text_language)], [
+    html.article([], [
       html.p([attribute.class("mb-4")], [
         html.a(
           [
@@ -109,15 +109,22 @@ pub fn detail_view(
           ],
         ),
       ]),
-      html.h1([attribute.class("mb-6 text-h1 font-bold")], [
-        html.text(text.title),
-      ]),
+      html.h1(
+        [
+          attribute.class("mb-6 text-h1 font-bold"),
+          document.lang_if_different(language, text_language),
+        ],
+        [html.text(text.title)],
+      ),
       document.fallback_notice(language, text_language),
       html.div([attribute.class("mb-8 grid gap-8 md:grid-cols-[2fr_3fr]")], [
         facts(site, language, concert),
         image(site, concert.image, text.title, Eager),
       ]),
-      document.prose(text.body),
+      document.prose(
+        [document.lang_if_different(language, text_language)],
+        text.body,
+      ),
     ]),
   ]
 }
@@ -145,37 +152,44 @@ pub fn featured(
     ],
     [
       image(site, concert.image, text.title, Eager),
-      html.div(
-        [
-          attribute.class("flex flex-col gap-4"),
-          document.lang_if_different(language, text_language),
-        ],
-        [
-          html.h3([attribute.class("text-h2 font-bold")], [
+      html.div([attribute.class("flex flex-col gap-4")], [
+        case text_language == language {
+          True -> element.none()
+          False -> document.in_swedish_label()
+        },
+        html.h3(
+          [
+            attribute.class("text-h2 font-bold"),
+            document.lang_if_different(language, text_language),
+          ],
+          [
             html.a(
               [attribute.href(href), attribute.class("hover:text-primary")],
               [
                 html.text(text.title),
               ],
             ),
-          ]),
-          case text.summary {
-            Some(summary) -> html.p([], [html.text(summary)])
-            None -> element.none()
-          },
-          facts(site, language, concert),
-          html.a(
-            [attribute.href(href), attribute.class("text-primary underline")],
-            [
-              html.text(language.pick(
-                language,
-                swedish: "Läs mer om konserten",
-                english: "More about the concert",
-              )),
-            ],
-          ),
-        ],
-      ),
+          ],
+        ),
+        case text.summary {
+          Some(summary) ->
+            html.p([document.lang_if_different(language, text_language)], [
+              html.text(summary),
+            ])
+          None -> element.none()
+        },
+        facts(site, language, concert),
+        html.a(
+          [attribute.href(href), attribute.class("text-primary underline")],
+          [
+            html.text(language.pick(
+              language,
+              swedish: "Läs mer om konserten",
+              english: "More about the concert",
+            )),
+          ],
+        ),
+      ]),
     ],
   )
 }

@@ -24,7 +24,7 @@ import ubs_website/view/news as news_view
 pub fn view(text: Text, after: List(Element(a))) -> List(Element(a)) {
   [
     html.h1([attribute.class("mb-8 text-h1 font-bold")], [html.text(text.title)]),
-    document.prose(text.body),
+    document.prose([], text.body),
     ..after
   ]
 }
