@@ -49,6 +49,10 @@ pub fn tables_name_their_position_test() {
   let assert Ok(empty) = entry.parse("members.toml", source)
   assert entry.tables(empty, "members") == Ok([])
 
+  let assert Ok(cleared) =
+    entry.parse("members.toml", "+++\nmembers = []\n+++\n")
+  assert entry.tables(cleared, "members") == Ok([])
+
   let assert Ok(data) =
     entry.parse(
       "members.toml",

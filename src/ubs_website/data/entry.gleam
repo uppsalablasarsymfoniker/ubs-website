@@ -215,7 +215,7 @@ pub fn date_times(
 ///
 pub fn tables(entry: Entry, field: String) -> Result(List(Entry), Error) {
   case tom.get(entry.fields, [field]) {
-    Error(tom.NotFound(_)) -> Ok([])
+    Error(tom.NotFound(_)) | Ok(tom.Array([])) -> Ok([])
     Ok(tom.ArrayOfTables(tables)) ->
       Ok(
         list.index_map(tables, fn(fields, index) {
