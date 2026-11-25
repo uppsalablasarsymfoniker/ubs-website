@@ -13,6 +13,7 @@ import ubs_website/route.{type Route}
 import ubs_website/tailwind
 import ubs_website/view/concert as concert_view
 import ubs_website/view/document
+import ubs_website/view/member as member_view
 import ubs_website/view/news as news_view
 import ubs_website/view/page
 
@@ -73,7 +74,9 @@ fn pages(
       pages.home,
       page.home_sections(site, language, content.concerts, content.news),
     ),
-    general(route.About, pages.about, []),
+    general(route.About, pages.about, [
+      member_view.view(language, content.members),
+    ]),
     general(route.Join, pages.join, [page.email_button(settings, language)]),
     general(route.Booking, pages.booking, [
       page.email_button(settings, language),
