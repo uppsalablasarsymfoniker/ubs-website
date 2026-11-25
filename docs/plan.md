@@ -222,7 +222,9 @@ i18n:
 - **members**, **settings** — file collections with `format: toml`, no i18n.
   Members is a list widget of objects, stored as `[[members]]` tables.
 - **Media** — `media_folder: assets/images/uploads`, `public_folder:
-  /images/uploads`, with the WebP transformation from *Technology*.
+  /images/uploads`, with the WebP transformation from *Technology*. Concerts
+  and news have their own folders, `assets/images/concerts` and
+  `assets/images/news`, so the CMS shows their existing images.
 
 ### Sign-in
 
