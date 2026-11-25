@@ -196,17 +196,36 @@ i18n:
 
 ### Sign-in
 
-Two options, both documented by Sveltia:
+Sveltia runs entirely in the editor's browser and talks to the GitHub API
+directly, so all it needs is a GitHub access token that may write to this
+repository. Sign-in is just how the browser gets that token. Every save is
+then a commit authored by the editor, and removing someone's access to the
+repository removes their access to the CMS.
 
-1. **Token** — each editor creates a fine-grained personal access token
-   (Contents: read and write on this repo) and pastes it once. Nothing to
-   host. Fiddly for non-technical editors.
-2. **OAuth** — "Sign in with GitHub" via `sveltia-cms-auth`, a Cloudflare
-   Worker paired with a GitHub App. Needs a Cloudflare account (free tier)
-   owned by UBS. Set as `base_url` in the backend config.
+Either way, each editor needs a GitHub account and the Write role on the
+repository — simplest as members of an "editors" team in the organisation.
 
-**Proposed:** start with tokens while building; switch to OAuth before
-editors are onboarded.
+Two ways to get the token, both documented by Sveltia:
+
+1. **Personal token** — the editor creates a fine-grained personal access
+   token on GitHub (Contents: read and write, this repository only) and
+   pastes it into the CMS once; the browser keeps it. Nothing to host, but
+   it takes a few minutes per editor, and tokens expire and must be renewed.
+2. **"Sign in with GitHub"** (OAuth):
+   1. The editor clicks the button; a popup opens GitHub's authorisation
+      page for UBS's GitHub App.
+   2. The editor approves; GitHub sends a one-time code to the sign-in
+      service, `sveltia-cms-auth`.
+   3. The service exchanges the code for a token, using the app's secret,
+      and hands the token back to the CMS window.
+
+   The service exists only because that secret cannot live in a static
+   page. It is a small open-source Cloudflare Worker, free tier, set up once
+   by whoever owns UBS's Cloudflare account, and named as `base_url` in the
+   CMS config.
+
+**Proposed:** personal tokens while building; "Sign in with GitHub" before
+the board starts editing.
 
 ## Pages
 
@@ -270,8 +289,55 @@ Static hosting has no server to receive a form post. Options, simplest first:
 - GitHub Actions on push to `main`, daily at 03:00, and on demand: set up
   Erlang and Gleam (`erlef/setup-beam`), download a pinned Tailwind
   standalone binary, test, build, deploy with `actions/deploy-pages`.
-- Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` until the
-  domain moves. GitHub Pages on the free plan needs a public repository.
+- Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` (GitHub Pages)
+  until the domain moves.
+
+### Hosting: GitHub Pages or Cloudflare
+
+Both serve the same `dist/` folder, both are free at this size, and both
+build in GitHub Actions, so the choice can be changed later.
+
+| | GitHub Pages | Cloudflare (Pages, or Workers static assets) |
+|---|---|---|
+| Accounts | None beyond GitHub | A Cloudflare account — needed anyway for CMS "Sign in with GitHub" |
+| Deploy | `actions/deploy-pages`, no secrets | `wrangler` from Actions, with an API token secret |
+| Repository | Must be public on the free plan | Public or private |
+| Old WordPress URLs | No server redirects: one HTML page per old URL with a meta refresh | Real 301 redirects from a `_redirects` file |
+| Headers | Fixed by GitHub | Custom headers (`_headers`), e.g. a Content Security Policy |
+| Preview deploys | None; only `main` is published | A preview URL for every branch and pull request |
+| Limits | 1 GB site, ~100 GB bandwidth per month (soft) | Unlimited bandwidth on static requests |
+| Custom domain | A/CNAME records at One.com; free HTTPS | `www` via CNAME; the bare domain needs the DNS moved to Cloudflare; free HTTPS |
+| Analytics | Bring your own | Cloudflare Web Analytics built in |
+
+Cloudflare now steers new projects to Workers static assets rather than
+Pages; for a static folder the two behave the same.
+
+**Proposed:** GitHub Pages for the preview while building, since it needs
+nothing new. Decide before launch: if UBS sets up Cloudflare for the CMS
+sign-in, move hosting there too, for the redirects and the previews.
+
+## Analytics
+
+"Cookie-free" analytics count visits without storing anything in the
+visitor's browser and without building a profile of any one visitor. A
+small script — or the host itself — records the page, referrer, country, and
+device type; visits are counted in aggregate, and IP addresses are not kept.
+Because nothing is stored on the device and no personal data is retained,
+no cookie banner or consent prompt is needed under GDPR and the ePrivacy
+rules, unlike Google Analytics.
+
+What it answers: which pages are read, how many visits a concert page gets,
+where visitors come from (Facebook, Google, a newspaper link). What it can't:
+follow one person across visits, or count unique visitors exactly.
+
+| Option | Cost | Notes |
+|---|---|---|
+| Cloudflare Web Analytics | Free | A script on any host, or automatic on Cloudflare hosting. Data held by Cloudflare (US company) |
+| GoatCounter | Free for non-commercial use | Open source, small, run by one developer in the EU |
+| Plausible | Paid (from roughly €9/month) | Open source, EU-hosted, polished dashboards; can be self-hosted |
+
+**Proposed:** Cloudflare Web Analytics if hosting moves to Cloudflare,
+otherwise GoatCounter. Not needed before launch.
 
 ## What the current site has
 
@@ -354,12 +420,10 @@ Extend the profile first, then the code.
 
 ## Open questions
 
-- Hosting: GitHub Pages or Cloudflare. GitHub Pages is one vendor fewer;
-  Cloudflare gives real 301 redirects for the old WordPress URLs, preview
-  deploys per pull request, unlimited bandwidth, and is needed anyway for the
-  CMS OAuth worker.
-- Who owns the Cloudflare account for the CMS sign-in worker?
-- Analytics: none, Cloudflare Web Analytics, or another cookie-free service.
+- Who owns UBS's Cloudflare account (for CMS sign-in, and possibly hosting
+  and analytics)?
+- Hosting for launch: GitHub Pages or Cloudflare (see *Hosting*).
+- Analytics: none, or one of the options in *Analytics*.
 
 ## Later follow-ups
 
