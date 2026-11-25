@@ -157,7 +157,7 @@ migration, once it is decided what to keep.
 | Collection | Storage | Fields | Notes |
 |---|---|---|---|
 | `pages` | `content/pages/<page>.<locale>.md` | title, description (meta), body | Fixed set: home, about, join, booking, contact. Both languages required. |
-| `concerts` | `content/concerts/<slug>.<locale>.md` | title, summary, body · *Swedish only:* performances (list of date-times), venue, ticket URL, image | Upcoming vs. past derived from the last performance. Program and collaborators go in the body. |
+| `concerts` | `content/concerts/<slug>.<locale>.md` | title, summary, body · *Swedish only:* performances (list of date-times), venue, ticket URL, image | Upcoming vs. past derived from the last performance. Program and collaborators go in the body. Tickets are always sold elsewhere; the site only links out. |
 | `news` | `content/news/<slug>.<locale>.md` | title, summary, body · *Swedish only:* date, image | |
 | `members` | `content/members.toml` | list of: name, section, role (optional) | See *Members*. Sections are a fixed list in code with Swedish and English names. |
 | `settings` | `content/settings.toml` | email, phone, postal address, Facebook, Instagram | Footer and contact page. |
@@ -226,6 +226,10 @@ Footer: contact details and social links from `settings`.
 | Boka oss | Body from `pages/booking`; contact link |
 | Kontakt | Body from `pages/contact`; contact details and social links from `settings` |
 | 404 | Both languages on one page, with links home |
+
+There are no recent photos of the orchestra, so the design must not depend on
+one: a typographic home page, and an Open Graph image built from the logo and
+name. A photo can be added later without a redesign.
 
 Every page has a `<title>`, a meta description, and Open Graph tags; the build
 writes `sitemap.xml` with both languages. Dates are formatted per language
@@ -300,9 +304,28 @@ Problems to fix in the move:
 - Leftover pages: membership login and registration (2018), `test`,
   `hem-2`, `hem-experiment`.
 
+## Core content
+
+Milestone 1 uses real content from the current site, not placeholders:
+
+| Content | Source | Notes |
+|---|---|---|
+| Home intro | "Om oss" section on the home page | |
+| About | "Om oss" section, competitions intro, conductor | Updated where stale (EM 2020 "upcoming") |
+| Join | Rehearsal facts from the conductor-search text (Mondays in Uppsala, members travel from Västerås and Stockholm) | The current site has no join page: new text, for the board to review |
+| Booking | — | No source: new text, for the board to review |
+| Contact | Footer: email, phone, postal address, Facebook, Instagram | Board to confirm phone and postal address — they belong to individual board members |
+| Concerts | Every concert from 2025 onward, with images | Older ones follow with the full migration |
+| News | Conductor search; latest from the news archive (SM 2023) | |
+| Members | — | Not migrated: the 2022 list is stale and nobody has consented. The page shows the section once the list is filled in |
+
+English text for the general pages is translated from the Swedish, since the
+current English page covers only a fraction of it. Machine-drafted text is
+listed in the pull request or commit so the board can review it.
+
 ## Migration
 
-**Deferred** until the core pages are in place. It starts with an inventory
+The full migration is **deferred** until the core pages are in place. It starts with an inventory
 of the current site (the WordPress sitemap lists ~140 posts and ~20 pages:
 concerts back to 2015, ~45 member profiles from 2018, competition pages, news,
 ticket notices, and the leftover pages above), and a keep / rework / drop
@@ -331,15 +354,18 @@ Extend the profile first, then the code.
 
 ## Open questions
 
-- Hosting: GitHub Pages as proposed, or Cloudflare Pages for preview deploys
-  per pull request?
+- Hosting: GitHub Pages or Cloudflare. GitHub Pages is one vendor fewer;
+  Cloudflare gives real 301 redirects for the old WordPress URLs, preview
+  deploys per pull request, unlimited bandwidth, and is needed anyway for the
+  CMS OAuth worker.
 - Who owns the Cloudflare account for the CMS sign-in worker?
-- Ticketing: always an external link (UKK, Tickster …), or anything on-site?
-- Newsletter or calendar feed (iCal) for upcoming concerts?
-- Analytics: none, or a cookie-free option (e.g. Plausible, Cloudflare Web
-  Analytics)?
-- Photos: is there a recent orchestra photo for the home page and Open Graph
-  image?
+- Analytics: none, Cloudflare Web Analytics, or another cookie-free service.
+
+## Later follow-ups
+
+- Newsletter sign-up.
+- Calendar feed (iCal) of upcoming concerts.
+- Orchestra photos for the home page and Open Graph image.
 
 ## Milestones
 
@@ -350,7 +376,7 @@ Extend the profile first, then the code.
    4. General pages, then concerts, then news, then the member list.
    5. 404, sitemap, meta tags.
    6. GitHub Actions deploy to the preview URL.
-   Placeholder content throughout.
+   Content from *Core content*, migrated in its own commits.
 2. **CMS** — Sveltia at `/admin` with the five collections; token sign-in,
    then OAuth.
 3. **Migration** — inventory, select, and migrate content; members give
