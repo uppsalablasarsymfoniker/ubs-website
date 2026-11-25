@@ -1,0 +1,4 @@
+# Members appear on the about page once they have agreed to be listed.
+# Each member is a [[members]] table with name, section, and an optional role.
+# Sections: conductor, flute, oboe, bassoon, clarinet, saxophone, horn, trumpet,
+# trombone, euphonium, tuba, double_bass, percussion.
