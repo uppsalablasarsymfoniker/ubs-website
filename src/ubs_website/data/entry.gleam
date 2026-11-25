@@ -24,6 +24,13 @@ pub type Entry {
   Entry(path: String, fields: Dict(String, Toml), body: String)
 }
 
+/// The translatable part of an entry: what a page, concert, or news item says.
+/// The body is HTML rendered from the entry's Markdown.
+///
+pub type Text {
+  Text(title: String, summary: Option(String), body: String)
+}
+
 /// A Swedish entry and, when someone has translated it, its English version.
 ///
 pub type Translations {
@@ -224,6 +231,24 @@ pub fn tables(entry: Entry, field: String) -> Result(List(Entry), Error) {
       )
     Ok(_) | Error(_) ->
       Error(error.ContentInvalidField(entry.path, field, "a list of items"))
+  }
+}
+
+/// The entry's title, optional summary, and body.
+///
+pub fn text(entry: Entry) -> Result(Text, Error) {
+  use title <- result.try(string(entry, "title"))
+  use summary <- result.try(optional_string(entry, "summary"))
+
+  Ok(Text(title:, summary:, body: body_to_html(entry)))
+}
+
+/// The text of an optional translation.
+///
+pub fn optional_text(entry: Option(Entry)) -> Result(Option(Text), Error) {
+  case entry {
+    Some(entry) -> text(entry) |> result.map(Some)
+    None -> Ok(None)
   }
 }
 
