@@ -82,7 +82,7 @@ required.
 | CSS | Tailwind standalone CLI, profile tokens in `@theme` under the same names as Orkestra's DaisyUI theme. No DaisyUI: a public site needs few components, and the full DaisyUI stylesheet can't be purged without Node |
 | Fonts | Self-hosted woff2 (as in Orkestra) — no request to Google at runtime |
 | CMS | Sveltia CMS, loaded from unpkg unversioned, as its docs recommend |
-| Hosting | GitHub Pages via GitHub Actions; rebuilt on push and daily, so a concert moves to "past" without an edit. **Proposed** |
+| Hosting | GitHub Pages via GitHub Actions now; Cloudflare at launch (see *Hosting*). Rebuilt on push and daily, so a concert moves to "past" without an edit |
 | Images | Sveltia converts uploads to WebP in the browser (max 2000px, quality 85) and strips EXIF. No build-time image processing |
 | Video | YouTube embeds via `youtube-nocookie.com`. **Proposed** |
 
@@ -224,8 +224,19 @@ Two ways to get the token, both documented by Sveltia:
    by whoever owns UBS's Cloudflare account, and named as `base_url` in the
    CMS config.
 
-**Proposed:** personal tokens while building; "Sign in with GitHub" before
-the board starts editing.
+**Decided:** "Sign in with GitHub". Personal tokens remain as a fallback
+for developers while the Worker isn't deployed yet.
+
+Setup, once UBS has a Cloudflare account:
+
+1. Deploy `sveltia-cms-auth` to Cloudflare Workers (its README has a
+   one-click deploy).
+2. Create a GitHub App (or OAuth App) in the `uppsalablasarsymfoniker`
+   organisation, with the Worker's `/callback` URL as the callback.
+3. Set the app's client ID and secret, and `ALLOWED_DOMAINS` (the site's
+   domains), as Worker secrets.
+4. Put the Worker URL in `static/admin/config.yml` as `backend.base_url`.
+5. Create an "editors" team with Write access to this repository.
 
 ## Pages
 
@@ -312,9 +323,9 @@ build in GitHub Actions, so the choice can be changed later.
 Cloudflare now steers new projects to Workers static assets rather than
 Pages; for a static folder the two behave the same.
 
-**Proposed:** GitHub Pages for the preview while building, since it needs
-nothing new. Decide before launch: if UBS sets up Cloudflare for the CMS
-sign-in, move hosting there too, for the redirects and the previews.
+**Decided:** GitHub Pages while building, since it needs nothing new.
+Cloudflare at launch — UBS needs a Cloudflare account for the CMS sign-in
+Worker either way, and the old WordPress URLs need real redirects.
 
 ## Analytics
 
@@ -336,8 +347,12 @@ follow one person across visits, or count unique visitors exactly.
 | GoatCounter | Free for non-commercial use | Open source, small, run by one developer in the EU |
 | Plausible | Paid (from roughly €9/month) | Open source, EU-hosted, polished dashboards; can be self-hosted |
 
-**Proposed:** Cloudflare Web Analytics if hosting moves to Cloudflare,
-otherwise GoatCounter. Not needed before launch.
+**Decided:** Cloudflare Web Analytics. It works on GitHub Pages too, via
+its script tag. The build reads the site token from the
+`CLOUDFLARE_ANALYTICS_TOKEN` environment variable (a GitHub Actions
+variable) and adds the script only when it is set, so local builds and
+forks send nothing. Once hosting moves to Cloudflare, analytics can be
+switched on in the dashboard instead and the variable removed.
 
 ## What the current site has
 
@@ -420,10 +435,8 @@ Extend the profile first, then the code.
 
 ## Open questions
 
-- Who owns UBS's Cloudflare account (for CMS sign-in, and possibly hosting
-  and analytics)?
-- Hosting for launch: GitHub Pages or Cloudflare (see *Hosting*).
-- Analytics: none, or one of the options in *Analytics*.
+- Who owns UBS's Cloudflare account? It blocks CMS sign-in, analytics,
+  and the move to Cloudflare hosting.
 
 ## Later follow-ups
 
@@ -441,8 +454,8 @@ Extend the profile first, then the code.
    5. 404, sitemap, meta tags.
    6. GitHub Actions deploy to the preview URL.
    Content from *Core content*, migrated in its own commits.
-2. **CMS** — Sveltia at `/admin` with the five collections; token sign-in,
-   then OAuth.
+2. **CMS** — Sveltia at `/admin` with the five collections; "Sign in with
+   GitHub" via the Worker; Cloudflare Web Analytics token.
 3. **Migration** — inventory, select, and migrate content; members give
    consent.
 4. **Launch** — redirects, DNS switch, retire WordPress.
