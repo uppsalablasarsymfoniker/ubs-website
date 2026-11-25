@@ -3,7 +3,7 @@
 Public website for Uppsala Blåsarsymfoniker (UBS), replacing the current
 WordPress/Divi site at uppsalablasarsymfoniker.se (`ubs.nu` redirects there).
 
-Status: building the core pages. Decisions marked **Proposed** are not yet agreed.
+Status: planning. Decisions marked **Proposed** are not yet agreed.
 
 Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 
@@ -15,11 +15,12 @@ Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 - As little technology as possible: Gleam, static HTML, no database, no
   server to run or patch.
 - Follows the UBS graphical profile (`docs/ubs-profile.html`).
+- Swedish first, with English throughout.
 
 ## Architecture
 
-**Proposed:** a static site built by Gleam from Markdown content in this repo,
-edited through a git-based CMS.
+A static site built by Gleam from Markdown content in this repo, edited
+through a git-based CMS.
 
 ```
  board member ──► /admin (Sveltia CMS, in the browser)
@@ -27,12 +28,13 @@ edited through a git-based CMS.
  AI agent ──────────────┤ edits files, opens PR / commits
                         ▼
                  GitHub repo: content/*.md + images
-                        │ push triggers CI
+                        │ push, or the daily schedule, triggers CI
                         ▼
           GitHub Actions: gleam run (generator) → dist/*.html
+                          tailwindcss → dist/css/site.css
                         │
                         ▼
-                 static hosting (GitHub Pages or Cloudflare Pages)
+                 GitHub Pages
 ```
 
 ### Does a static site work with a CMS web UI?
@@ -46,40 +48,43 @@ Trade-offs to accept:
 
 - Edits appear after the rebuild, not instantly. The CMS shows a preview
   while editing.
-- Editors sign in with a GitHub account (free) — **agreed**. Sveltia needs a
-  small OAuth relay for that (a free Cloudflare Worker, `sveltia-cms-auth`);
-  alternatively each editor pastes a personal access token once.
+- Editors sign in with a GitHub account — **agreed**. Each editor needs the
+  Write role on the repository. See *CMS* for the sign-in options.
 - Anything dynamic — a contact form, a newsletter sign-up — needs an
   external service. See *Forms*.
 
 ### Why this CMS shape is agent-friendly
 
 Content is Markdown with TOML front matter in a fixed folder layout, and the
-CMS config (`admin/config.yml`) doubles as the schema. An agent edits the same
-files the CMS does, reviewable as an ordinary diff, with git history as the
-audit log and undo. No API keys, MCP server, or vendor account required.
+CMS config (`static/admin/config.yml`) doubles as the schema. An agent edits
+the same files the CMS does, reviewable as an ordinary diff, with git history
+as the audit log and undo. No API keys, MCP server, or vendor account
+required.
 
 ### Alternatives considered
 
-| Option | Why not (for now) |
+| Option | Why not |
 |---|---|
 | Hosted headless CMS (Sanity, Storyblok, Contentful) | Vendor account, API keys, and a runtime or build-time API dependency. Agent access goes through an MCP server rather than plain files. |
 | Self-hosted CMS (Payload, Strapi, Directus) | Needs a server and a database to host, back up, and patch. |
-| Decap CMS | Same model as Sveltia and config-compatible; Sveltia is the faster, maintained successor. Keep as fallback. |
-| Gleam server (Wisp/Mist) | Only needed for request-time features. None are required yet. |
+| Decap CMS | Same model as Sveltia and config-compatible; Sveltia is the faster, maintained successor. Kept as fallback. |
+| Gleam server (Wisp/Mist) | Only needed for request-time features. None are required. |
+| `lustre_ssg` | The site has a dozen routes in two languages; a build module that renders Lustre elements and writes files is shorter than adapting a framework to the language rules below. |
 
 ### Technology
 
-| Concern | Proposed choice | To confirm |
-|---|---|---|
-| Generator | Gleam + Lustre for HTML, `lustre_ssg` or a small hand-written build script | Whether `lustre_ssg` covers collections or a custom script is simpler |
-| Markdown | `mork` — passes the full CommonMark spec test suite | — |
-| Front matter | TOML, parsed with `tom` (Sveltia supports `toml-frontmatter`) | — |
-| CSS | Tailwind standalone CLI, profile tokens in `@theme` under the same names as Orkestra's DaisyUI theme. No DaisyUI: a public site needs few components and the full DaisyUI stylesheet can't be purged without Node | — |
-| CMS | Sveltia CMS | GitHub OAuth relay vs. personal access tokens |
-| Hosting | GitHub Pages via GitHub Actions, rebuilt on push and daily (so a concert moves to "past" without an edit) | Cloudflare Pages if preview deploys per PR are wanted |
-| Video | YouTube embeds (current practice) | Privacy-enhanced `youtube-nocookie.com` embeds |
-| Images | Committed to the repo, resized at build time or by hand | Repo size once galleries are migrated |
+| Concern | Choice |
+|---|---|
+| Generator | Gleam, a hand-written build module; Lustre elements rendered to HTML strings |
+| Markdown | `mork` — passes the full CommonMark spec test suite |
+| Front matter | TOML (`+++` delimited), parsed with `tom`. Sveltia writes it with `format: toml-frontmatter` |
+| Dates | `gleam_time`. Sveltia writes native TOML date-times (`2027-01-30T19:00:00.000`) and dates (`2027-01-30`) |
+| CSS | Tailwind standalone CLI, profile tokens in `@theme` under the same names as Orkestra's DaisyUI theme. No DaisyUI: a public site needs few components, and the full DaisyUI stylesheet can't be purged without Node |
+| Fonts | Self-hosted woff2 (as in Orkestra) — no request to Google at runtime |
+| CMS | Sveltia CMS, loaded from unpkg unversioned, as its docs recommend |
+| Hosting | GitHub Pages via GitHub Actions; rebuilt on push and daily, so a concert moves to "past" without an edit. **Proposed** |
+| Images | Sveltia converts uploads to WebP in the browser (max 2000px, quality 85) and strips EXIF. No build-time image processing |
+| Video | YouTube embeds via `youtube-nocookie.com`. **Proposed** |
 
 ### Why Markdown and not Djot
 
@@ -94,12 +99,12 @@ Swedish is the default and lives at the site root; English lives under `/en/`.
 
 | Content | Swedish | English |
 |---|---|---|
-| General pages (home, about, join, booking, contact) | required | **required** — the build fails without it |
+| General pages (home, about, join, booking, contact) | required | **required** — the CMS won't save without it, and the build fails without it |
 | Concerts, news | required | optional |
 | UI text (navigation, labels, dates) | in code | in code |
 
 - Translations are separate files side by side: `content/concerts/<slug>.sv.md`
-  and `<slug>.en.md` (Sveltia's `multiple_files` i18n structure).
+  and `<slug>.en.md`.
 - Fields that don't vary by language — dates, venue, ticket link, image — are
   read from the Swedish file only.
 - An English listing shows every concert and news item. An item without an
@@ -130,88 +135,115 @@ content/          Markdown + TOML front matter, edited by the CMS and agents
   settings.toml   contact details, social links
 src/ubs_website.gleam   build entry point: content → dist/
 src/ubs_website/        one module per domain (concert, news, page, …)
+test/                   gleeunit tests
 assets/css/input.css    Tailwind input with the profile tokens
-static/                 copied to dist/ as is: fonts, images, admin/ (Sveltia)
+static/                 copied to dist/ as is
+  admin/              Sveltia: index.html + config.yml
+  fonts/              self-hosted woff2 + OFL licences
+  images/             logos; uploads/ for CMS media
 dist/                   build output, not committed
 ```
 
 Build: `gleam run && tailwindcss -i assets/css/input.css -o dist/css/site.css --minify`.
-`BASE_PATH` sets the URL prefix (e.g. `/ubs-website` for a GitHub Pages
-project URL); it defaults to the domain root.
+`BASE_PATH` sets the URL prefix (e.g. `/ubs-website` for the GitHub Pages
+project URL); it defaults to the domain root. Every internal link and asset
+URL goes through one path helper so both work.
 
 ## Content model
 
-Each collection is a folder under `content/`; each entry is one Markdown file.
+Milestone 1 builds the first five collections. The rest arrive with the
+migration, once it is decided what to keep.
 
-| Collection | Fields | Notes |
-|---|---|---|
-| `concerts` | title, date/time(s), venue, description, program (pieces + composers), ticket link, poster image, collaborators | Upcoming vs. past derived from date. Home page shows the next one. |
-| `competitions` | competition (SM/EM/VM), year, placement/result, repertoire, report text, images | Replaces the per-year `sm-2019`-style pages. |
-| `news` | title, date, body, image | Also covers announcements like the conductor search. |
-| `members` | name, instrument/section, role (e.g. solo, konsertmästare), optional photo and Q&A profile | Drives the member list and "Möt våra musiker". See *Members*. |
-| `testimonials` | quote, author, author role, date | "Sagt om oss". |
-| `videos` | title, YouTube ID, composer, date | "Filmklipp". |
-| `galleries` | title, date, images | "Bilder". |
-| `press` | press releases (title, date, file/body), press images with photographer credit | |
-| `sponsors` | name, logo, link | Footer and sponsor page. |
-| `pages` | single pages: about, join, booking, contact, English | Free-form Markdown. |
-| `settings` | contact email, phone, postal address, social links | One file, used by footer. |
+| Collection | Storage | Fields | Notes |
+|---|---|---|---|
+| `pages` | `content/pages/<page>.<locale>.md` | title, description (meta), body | Fixed set: home, about, join, booking, contact. Both languages required. |
+| `concerts` | `content/concerts/<slug>.<locale>.md` | title, summary, body · *Swedish only:* performances (list of date-times), venue, ticket URL, image | Upcoming vs. past derived from the last performance. Program and collaborators go in the body. |
+| `news` | `content/news/<slug>.<locale>.md` | title, summary, body · *Swedish only:* date, image | |
+| `members` | `content/members.toml` | list of: name, section, role (optional) | See *Members*. Sections are a fixed list in code with Swedish and English names. |
+| `settings` | `content/settings.toml` | email, phone, postal address, Facebook, Instagram | Footer and contact page. |
+| `competitions` | later | competition (SM/EM/VM), year, result, repertoire, report, images | Replaces the per-year `sm-2019`-style pages. |
+| `testimonials` | later | quote, author, author role, date | "Sagt om oss". |
+| `videos` | later | title, YouTube ID, composer, date | "Filmklipp". |
+| `galleries` | later | title, date, images | "Bilder". |
+| `press` | later | releases; press images with photographer credit | |
+| `sponsors` | later | name, logo, link | |
 
-## Site structure
+Member sections, in display order: dirigent, flöjt, oboe, fagott, klarinett,
+saxofon, horn, trumpet/kornett, trombon, euphonium, tuba, kontrabas, slagverk.
 
-Every page in Swedish and English (see *Languages*).
+## CMS
 
-- **Hem** — next concert, upcoming performances, a member spotlight, latest
-  video, testimonials, news.
-- **Konserter** — upcoming and past concerts; one page per concert.
-- **Tävlingar** — history and results for SM, EM, VM; one page per event.
-- **Om oss** — history and profile, conductor, **member list by section**,
-  member spotlights.
-- **Bli medlem** — rehearsals (Mondays in Uppsala), how to audition/join,
-  which instruments are needed.
-- **Boka oss** — booking the orchestra for events.
-- **Media** — videos, photo galleries, press (releases and press images).
-- **Nyheter** — news and announcements.
-- **Sponsorer** — sponsors and supporters.
-- **Kontakt** — email, phone, postal address, social links.
+Sveltia CMS at `/admin`, configured in `static/admin/config.yml`.
 
-## What the current site has
+```yaml
+i18n:
+  structure: multiple_files
+  locales: [sv, en]
+  default_locale: sv
+```
 
-Surveyed 2026-11-25. Everything below should carry over:
+- **pages** — a file collection, one entry per page, file path
+  `content/pages/about.{{locale}}.md`. Fields `i18n: true`, which makes every
+  locale required.
+- **concerts**, **news** — folder collections, `format: toml-frontmatter`.
+  Translatable fields `i18n: true` with `required: [sv]`, so English may be
+  left out. Language-neutral fields `i18n: duplicate` (edited in Swedish,
+  read-only in English).
+- **members**, **settings** — file collections with `format: toml`, no i18n.
+  Members is a list widget of objects, stored as `[[members]]` tables.
+- **Media** — `media_folder: static/images/uploads`, `public_folder:
+  /images/uploads`, with the WebP transformation from *Technology*.
 
-- Navigation: Hem, Konserter, Tävlingar, Om oss (with Bilder, Filmklipp),
-  Sponsorer, Kontakt, Press, English.
-- Home page sections: next concert, upcoming performances, "Möt våra musiker"
-  (member Q&A profiles), about, video clips, "Sagt om oss" (quotes from
-  adjudicators, conductors, composers).
-- Concert archive back to at least 2024; one page per concert.
-- Competition pages: SM 2001, 2002, 2004, 2017, 2018, 2019, 2023; VM 2017;
-  EM 2018, 2023, 2024.
-- Member list (`/orkestermedlemmar/`) grouped by instrument, last updated 2022.
-- Press page with press releases (2018–2019) and downloadable press photos.
-- Video page of YouTube recordings; a photo page.
-- English page with testimonials.
-- Footer: contact email and phone, postal address, Facebook and Instagram,
-  sponsors.
-- Conductor-search announcement linking to a Google Form.
+### Sign-in
 
-Problems to fix in the move:
+Two options, both documented by Sveltia:
 
-- Stale content: member list from 2022; the competitions page says the EM
-  2020 trip is upcoming; the photo page holds one 2018 gallery.
-- "Kontakt" and "Sponsorer" are anchor links to the footer, not pages.
-- A broken `/undefined` link on the home page.
+1. **Token** — each editor creates a fine-grained personal access token
+   (Contents: read and write on this repo) and pastes it once. Nothing to
+   host. Fiddly for non-technical editors.
+2. **OAuth** — "Sign in with GitHub" via `sveltia-cms-auth`, a Cloudflare
+   Worker paired with a GitHub App. Needs a Cloudflare account (free tier)
+   owned by UBS. Set as `base_url` in the backend config.
+
+**Proposed:** start with tokens while building; switch to OAuth before
+editors are onboarded.
+
+## Pages
+
+Header: logo and name, navigation (Konserter, Nyheter, Om oss, Bli medlem,
+Boka oss, Kontakt), language switch. Collapses to a menu on narrow screens.
+Footer: contact details and social links from `settings`.
+
+| Page | Content |
+|---|---|
+| Hem | Intro from `pages/home`; the next concert, prominently; up to three more upcoming concerts; the three latest news items; links to join and booking |
+| Konserter | Upcoming, soonest first; past, newest first, grouped by year |
+| Concert | Title, every performance date and time, venue, ticket button while upcoming and a URL is set, image, body |
+| Nyheter | All news, newest first, with date and summary |
+| News item | Title, date, image, body |
+| Om oss | Body from `pages/about`; member list grouped by section in the order above |
+| Bli medlem | Body from `pages/join`; contact link |
+| Boka oss | Body from `pages/booking`; contact link |
+| Kontakt | Body from `pages/contact`; contact details and social links from `settings` |
+| 404 | Both languages on one page, with links home |
+
+Every page has a `<title>`, a meta description, and Open Graph tags; the build
+writes `sitemap.xml` with both languages. Dates are formatted per language
+("30 januari 2027, 19.00" / "30 January 2027, 19:00").
+
+Accessibility target: WCAG 2.1 AA — the profile's contrast rules, semantic
+headings, visible focus, `lang` on every page and on Swedish fallbacks.
 
 ## Members
 
 The member list is public personal data, so:
 
-- Publish name, instrument, and role only, with each member's consent.
-  Photos and Q&A profiles are opt-in per member.
+- Publish name, section, and role only, with each member's consent.
+  Photos and Q&A profiles are opt-in per member, and come later.
 - Keep the list current — a list that is years out of date is worse than none.
 - **Later, maybe:** generate the list from Orkestra, which already holds
-  members and sections. Not designed for now; the `members` collection is
-  kept simple enough that an export could replace it.
+  members and sections. Not designed for now; `members.toml` is kept simple
+  enough that an export could replace it.
 
 ## Forms
 
@@ -224,13 +256,58 @@ Static hosting has no server to receive a form post. Options, simplest first:
 
 **Proposed:** 1 and 2.
 
+## Build, test, deploy
+
+- Content errors — a missing field, malformed front matter, a general page
+  without English — fail the build with a message naming the file, so an
+  editor can fix it from the CI log. The build never crashes on content.
+- `gleam test` covers content parsing, the language fallback rules, routing,
+  and date formatting.
+- GitHub Actions on push to `main`, daily at 03:00, and on demand: set up
+  Erlang and Gleam (`erlef/setup-beam`), download a pinned Tailwind
+  standalone binary, test, build, deploy with `actions/deploy-pages`.
+- Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` until the
+  domain moves. GitHub Pages on the free plan needs a public repository.
+
+## What the current site has
+
+Surveyed 2026-11-25. Most of this should carry over, after the cleanup in
+*Migration*:
+
+- Navigation: Hem, Konserter, Tävlingar, Om oss (with Bilder, Filmklipp),
+  Sponsorer, Kontakt, Press, English.
+- Home page sections: next concert, upcoming performances, "Möt våra musiker"
+  (member Q&A profiles), about, video clips, "Sagt om oss" (quotes from
+  adjudicators, conductors, composers).
+- Concert archive back to 2015; one page per concert.
+- Competition pages: SM 2001, 2002, 2004, 2017, 2018, 2019, 2023; VM 2017;
+  EM 2018, 2023, 2024.
+- Member list (`/orkestermedlemmar/`) grouped by instrument, last updated 2022.
+- Board list (`/styrelse/`), last updated 2022.
+- Press page with press releases (2018–2019) and downloadable press photos.
+- Video page of YouTube recordings; a photo page.
+- English page with testimonials.
+- Footer: contact email and phone, postal address, Facebook and Instagram,
+  sponsors.
+- Conductor-search announcement linking to a Google Form.
+
+Problems to fix in the move:
+
+- Stale content: member and board lists from 2022; the competitions page says
+  the EM 2020 trip is upcoming; the photo page holds one 2018 gallery.
+- "Kontakt" and "Sponsorer" are anchor links to the footer, not pages.
+- A broken `/undefined` link on the home page.
+- Leftover pages: membership login and registration (2018), `test`,
+  `hem-2`, `hem-experiment`.
+
 ## Migration
 
 **Deferred** until the core pages are in place. It starts with an inventory
 of the current site (the WordPress sitemap lists ~140 posts and ~20 pages:
 concerts back to 2015, ~45 member profiles from 2018, competition pages, news,
-ticket notices, and leftover test pages), and a keep / rework / drop decision
-per group. The intent is to clean up rather than carry everything over.
+ticket notices, and the leftover pages above), and a keep / rework / drop
+decision per group. The intent is to clean up rather than carry everything
+over.
 
 Then:
 
@@ -245,31 +322,39 @@ Then:
 ## Graphical profile
 
 `docs/ubs-profile.html` is copied from Orkestra and is the source of truth for
-color, typography, logo, and spacing. The `ubs-brand` skill in
-`.claude/skills/` still points at Orkestra's paths (`priv/static/css/input.css`,
-`src/orkestra/pages/`, the `tailwind` skill); adapt it once the stack and
-layout here are fixed.
+color, typography, logo, and spacing. The `ubs-brand` and `tailwind` skills in
+`.claude/skills/` apply it to this repository.
 
 The profile is written for an app UI. A public site will likely need more:
-image treatment, hero layouts, a wider type scale for display headings. Extend
-the profile first, then the code.
+image treatment, hero layouts, a larger display size for the home page.
+Extend the profile first, then the code.
 
 ## Open questions
 
-- Hosting: GitHub Pages, or Cloudflare Pages for preview deploys per PR?
+- Hosting: GitHub Pages as proposed, or Cloudflare Pages for preview deploys
+  per pull request?
+- Who owns the Cloudflare account for the CMS sign-in worker?
 - Ticketing: always an external link (UKK, Tickster …), or anything on-site?
 - Newsletter or calendar feed (iCal) for upcoming concerts?
 - Analytics: none, or a cookie-free option (e.g. Plausible, Cloudflare Web
   Analytics)?
+- Photos: is there a recent orchestra photo for the home page and Open Graph
+  image?
 
 ## Milestones
 
-1. **Core pages** — Gleam generator, profile tokens, layout, both languages;
-   home, about (with member list), join, booking, contact, concerts, news.
-   Placeholder content; deployed to a preview URL.
-2. **CMS** — Sveltia at `/admin` with the core collections, GitHub auth
-   working.
+1. **Core pages** — one small commit per step:
+   1. Gleam project (`gleam new`, `gleam add`), CLAUDE.md commands.
+   2. Content loading: front matter, Markdown, both languages, errors.
+   3. Layout, CSS tokens, fonts, logos.
+   4. General pages, then concerts, then news, then the member list.
+   5. 404, sitemap, meta tags.
+   6. GitHub Actions deploy to the preview URL.
+   Placeholder content throughout.
+2. **CMS** — Sveltia at `/admin` with the five collections; token sign-in,
+   then OAuth.
 3. **Migration** — inventory, select, and migrate content; members give
    consent.
 4. **Launch** — redirects, DNS switch, retire WordPress.
-5. **Later** — Orkestra integration for members and/or concerts.
+5. **Later** — remaining collections; Orkestra integration for members and/or
+   concerts.
