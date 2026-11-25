@@ -344,7 +344,7 @@ fn footer(site: Site, settings: Settings, language: Language) -> Element(a) {
           ]),
         ]),
         html.div([attribute.class("flex flex-col gap-2")], [
-          html.h2([attribute.class("label-type text-muted-inverse")], [
+          html.h2([attribute.class("label-type font-body text-muted-inverse")], [
             html.text(language.pick(
               language,
               swedish: "Kontakt",
