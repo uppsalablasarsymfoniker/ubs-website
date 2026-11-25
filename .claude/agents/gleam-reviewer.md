@@ -21,7 +21,7 @@ work from the summaries below when the source itself is available:
    **Anti-patterns** are findings.
 3. `.claude/skills/ubs-brand/SKILL.md` and `.claude/skills/tailwind/SKILL.md`
    — only when the diff touches markup in `src/ubs_website/` or
-   `assets/css/input.css`.
+   `src/app.css`.
 
 **`CLAUDE.md` wins where they disagree.**
 
@@ -51,7 +51,7 @@ they outrank anything stylistic:
 gleam build          # compile errors, unused imports, inexhaustive cases
 gleam test           # regressions
 gleam format --check src test
-gleam run            # the site must still build from the content in content/
+gleam run build      # the site must still build from the content in content/
 ```
 
 ## What to check

@@ -9,8 +9,8 @@ Tailwind CSS v4 conventions for this project: consistent spacing scale and direc
 ## Project context
 
 - Markup is **Gleam + Lustre**, not JSX. Classes live in `attribute.class("…")` inside `src/ubs_website/*.gleam`. There is no `className` and no `.tsx` in this repo.
-- Tailwind **v4** (`@import "tailwindcss"` in `assets/css/input.css`). The spacing unit is `--spacing: 0.25rem`, so a scale number of `N` equals `N × 4px`.
-- No component library: every component is built from utilities. Markdown body content is styled by the `.prose` rules in `assets/css/input.css`, not by utilities.
+- Tailwind **v4** (`@import "tailwindcss"` in `src/app.css`). The spacing unit is `--spacing: 0.25rem`, so a scale number of `N` equals `N × 4px`.
+- No component library: every component is built from utilities. Markdown body content is styled by the `.prose` rules in `src/app.css`, not by utilities.
 - User-facing strings are Swedish; class names and any code you write stay English.
 
 Read the individual rule file before reporting or fixing a violation of it — each one has the rationale and the correct replacement.
@@ -81,4 +81,4 @@ For each fix:
 2. Spacing fixes shift pixels by design — preserve the *layout intent* (which gaps separate which elements), not the exact rendered spacing.
 3. A spacing-direction fix moves spacing to a different element. Update that sibling or parent in the same edit, and check the first and last child of the stack don't lose or gain an edge gap.
 4. Run `gleam format` when done, and rebuild CSS if class names changed:
-   `tailwindcss -i assets/css/input.css -o dist/css/site.css`
+   `gleam run build` (it runs Tailwind)

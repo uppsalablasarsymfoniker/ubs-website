@@ -30,8 +30,7 @@ through a git-based CMS.
                  GitHub repo: content/*.md + images
                         │ push, or the daily schedule, triggers CI
                         ▼
-          GitHub Actions: gleam run (generator) → dist/*.html
-                          tailwindcss → dist/css/site.css
+          GitHub Actions: gleam run build → dist/ (HTML, CSS, assets)
                         │
                         ▼
                  GitHub Pages
@@ -56,7 +55,7 @@ Trade-offs to accept:
 ### Why this CMS shape is agent-friendly
 
 Content is Markdown with TOML front matter in a fixed folder layout, and the
-CMS config (`static/admin/config.yml`) doubles as the schema. An agent edits
+CMS config (`assets/admin/config.yml`) doubles as the schema. An agent edits
 the same files the CMS does, reviewable as an ordinary diff, with git history
 as the audit log and undo. No API keys, MCP server, or vendor account
 required.
@@ -69,17 +68,17 @@ required.
 | Self-hosted CMS (Payload, Strapi, Directus) | Needs a server and a database to host, back up, and patch. |
 | Decap CMS | Same model as Sveltia and config-compatible; Sveltia is the faster, maintained successor. Kept as fallback. |
 | Gleam server (Wisp/Mist) | Only needed for request-time features. None are required. |
-| `lustre_ssg` | The site has a dozen routes in two languages; a build module that renders Lustre elements and writes files is shorter than adapting a framework to the language rules below. |
+| `lustre_ssg` | The site has a dozen routes in two languages; a build module that renders Lustre elements and writes files is shorter than adapting a framework to the language rules below. Hayleigh's own site, the newest reference, does the same. |
 
 ### Technology
 
 | Concern | Choice |
 |---|---|
-| Generator | Gleam, a hand-written build module; Lustre elements rendered to HTML strings |
+| Generator | Gleam, a hand-written build module; Lustre elements rendered to HTML strings. Structure follows Hayleigh Thompson's `hayleigh.dev` (see *Repository layout*) |
 | Markdown | `mork` — passes the full CommonMark spec test suite |
 | Front matter | TOML (`+++` delimited), parsed with `tom`. Sveltia writes it with `format: toml-frontmatter` |
 | Dates | `gleam_time`. Sveltia writes native TOML date-times (`2027-01-30T19:00:00.000`) and dates (`2027-01-30`) |
-| CSS | Tailwind standalone CLI, profile tokens in `@theme` under the same names as Orkestra's DaisyUI theme. No DaisyUI: a public site needs few components, and the full DaisyUI stylesheet can't be purged without Node |
+| CSS | Tailwind, run from the build through `glailglind` (downloads the pinned standalone binary; no Node, no separate step). Profile tokens in `@theme` under the same names as Orkestra's DaisyUI theme. No DaisyUI: a public site needs few components, and the full DaisyUI stylesheet can't be purged without Node |
 | Fonts | Self-hosted woff2 (as in Orkestra) — no request to Google at runtime |
 | CMS | Sveltia CMS, loaded from unpkg unversioned, as its docs recommend |
 | Hosting | GitHub Pages via GitHub Actions now; Cloudflare at launch (see *Hosting*). Rebuilt on push and daily, so a concert moves to "past" without an edit |
@@ -133,18 +132,34 @@ content/          Markdown + TOML front matter, edited by the CMS and agents
   news/           <slug>.sv.md [+ <slug>.en.md]
   members.toml    member list
   settings.toml   contact details, social links
-src/ubs_website.gleam   build entry point: content → dist/
-src/ubs_website/        one module per domain (concert, news, page, …)
+src/
+  app.css               Tailwind input with the profile tokens
+  ubs_website.gleam     entry point: `gleam run build`
+  ubs_website/
+    build.gleam         renders every route and writes dist/
+    error.gleam         one error type for everything the build can fail on
+    tailwind.gleam      runs Tailwind through glailglind
+    data/               content types and loading: page, concert, news,
+                        member, settings, date, markdown
+    view/               document shell, layout, and the page views
+    meta/               sitemap
 test/                   gleeunit tests
-assets/css/input.css    Tailwind input with the profile tokens
-static/                 copied to dist/ as is
+assets/                 copied to dist/ as is
   admin/              Sveltia: index.html + config.yml
   fonts/              self-hosted woff2 + OFL licences
   images/             logos; uploads/ for CMS media
 dist/                   build output, not committed
 ```
 
-Build: `gleam run && tailwindcss -i assets/css/input.css -o dist/css/site.css --minify`.
+The layout mirrors Hayleigh Thompson's `hayleigh.dev`
+(github.com/hayleigh-dot-dev/hayleigh.dev): `data/` for what the content is,
+`view/` for how it looks, `meta/` for machine-readable output, and one build
+module. Unlike that site, the build returns errors rather than asserting, per
+*Build, test, deploy*.
+
+Build: `gleam run build`. A `serve` command with live reload, like
+`hayleigh.dev`'s, is a later follow-up; until then, preview `dist/` with any
+static file server.
 `BASE_PATH` sets the URL prefix (e.g. `/ubs-website` for the GitHub Pages
 project URL); it defaults to the domain root. Every internal link and asset
 URL goes through one path helper so both work.
@@ -173,7 +188,7 @@ saxofon, horn, trumpet/kornett, trombon, euphonium, tuba, kontrabas, slagverk.
 
 ## CMS
 
-Sveltia CMS at `/admin`, configured in `static/admin/config.yml`.
+Sveltia CMS at `/admin`, configured in `assets/admin/config.yml`.
 
 ```yaml
 i18n:
@@ -191,7 +206,7 @@ i18n:
   read-only in English).
 - **members**, **settings** — file collections with `format: toml`, no i18n.
   Members is a list widget of objects, stored as `[[members]]` tables.
-- **Media** — `media_folder: static/images/uploads`, `public_folder:
+- **Media** — `media_folder: assets/images/uploads`, `public_folder:
   /images/uploads`, with the WebP transformation from *Technology*.
 
 ### Sign-in
@@ -235,7 +250,7 @@ Setup, once UBS has a Cloudflare account:
    organisation, with the Worker's `/callback` URL as the callback.
 3. Set the app's client ID and secret, and `ALLOWED_DOMAINS` (the site's
    domains), as Worker secrets.
-4. Put the Worker URL in `static/admin/config.yml` as `backend.base_url`.
+4. Put the Worker URL in `assets/admin/config.yml` as `backend.base_url`.
 5. Create an "editors" team with Write access to this repository.
 
 ## Pages
@@ -298,8 +313,8 @@ Static hosting has no server to receive a form post. Options, simplest first:
 - `gleam test` covers content parsing, the language fallback rules, routing,
   and date formatting.
 - GitHub Actions on push to `main`, daily at 03:00, and on demand: set up
-  Erlang and Gleam (`erlef/setup-beam`), download a pinned Tailwind
-  standalone binary, test, build, deploy with `actions/deploy-pages`.
+  Erlang and Gleam (`erlef/setup-beam`), test, build, deploy with
+  `actions/deploy-pages`.
 - Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` (GitHub Pages)
   until the domain moves.
 
@@ -443,6 +458,7 @@ Extend the profile first, then the code.
 - Newsletter sign-up.
 - Calendar feed (iCal) of upcoming concerts.
 - Orchestra photos for the home page and Open Graph image.
+- `gleam run serve`: a local server with live reload while editing.
 
 ## Milestones
 

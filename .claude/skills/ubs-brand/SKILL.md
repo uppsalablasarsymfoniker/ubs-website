@@ -1,12 +1,12 @@
 ---
 name: ubs-brand
-description: This skill should be used when writing or reviewing any user-facing markup or styling in this project — Lustre views in `src/ubs_website/`, `assets/css/input.css`, a new page, view, or component — or when picking a color, font size, or heading level, styling text on a colored background, placing the logo, or when the user mentions brand, graphical profile, colors, typography, contrast, or the logo. Supplies the UBS brand tokens and the contrast rules that constrain them.
+description: This skill should be used when writing or reviewing any user-facing markup or styling in this project — Lustre views in `src/ubs_website/`, `src/app.css`, a new page, view, or component — or when picking a color, font size, or heading level, styling text on a colored background, placing the logo, or when the user mentions brand, graphical profile, colors, typography, contrast, or the logo. Supplies the UBS brand tokens and the contrast rules that constrain them.
 allowed-tools: Read, Glob, Grep, Edit, Bash(grep:*), Bash(rg:*)
 ---
 
-UBS brand tokens for this project. **Source of truth: `docs/ubs-profile.html`** — open it for specimens, the live contrast matrix, and print values. Change that file first; `assets/css/input.css` mirrors it.
+UBS brand tokens for this project. **Source of truth: `docs/ubs-profile.html`** — open it for specimens, the live contrast matrix, and print values. Change that file first; `src/app.css` mirrors it.
 
-Every value below already exists as a Tailwind v4 `@theme` token in `assets/css/input.css`. The names follow the profile's §06 theme map, so `bg-primary` means the same here as in Orkestra. **Use the token, never a raw hex.** A hex literal in markup or CSS is the bug this skill exists to prevent.
+Every value below already exists as a Tailwind v4 `@theme` token in `src/app.css`. The names follow the profile's §06 theme map, so `bg-primary` means the same here as in Orkestra. **Use the token, never a raw hex.** A hex literal in markup or CSS is the bug this skill exists to prevent.
 
 ## Ownership
 
@@ -14,9 +14,9 @@ This skill owns **color, typography, logo, and assets**. It does *not* own spaci
 
 ## Rebuilding
 
-After changing classes, rebuild: `tailwindcss -i assets/css/input.css -o dist/css/site.css`.
+After changing classes, rebuild: `gleam run build` (it runs Tailwind).
 
-The brand utilities below are force-emitted via `@source inline(...)` in `input.css`, so they exist even before first use — do not remove those directives. Any *other* new utility is generated only when Tailwind finds it in a source file, and until you rebuild it silently falls back to the inherited value rather than erroring.
+The brand utilities below are force-emitted via `@source inline(...)` in `src/app.css`, so they exist even before first use — do not remove those directives. Any *other* new utility is generated only when Tailwind finds it in a source file, and until you rebuild it silently falls back to the inherited value rather than erroring.
 
 ## Color
 
@@ -89,7 +89,7 @@ Six steps. Size, line-height, and letter-spacing travel together in one utility 
 
 ## Logo
 
-Files live in `static/images/` and are served from `images/` under the site's base path — build the URL with the path helper, never a literal `/images/…`. Pick the variant by background; do not recolor at runtime.
+Files live in `assets/images/` and are served from `images/` under the site's base path — build the URL with the path helper, never a literal `/images/…`. Pick the variant by background; do not recolor at runtime.
 
 | File | Background |
 |---|---|
@@ -105,7 +105,7 @@ Files live in `static/images/` and are served from `images/` under the site's ba
 
 ## Radius
 
-Three steps, mapped onto Tailwind's radius utilities: `rounded-sm` 4px (buttons, inputs, tabs) · `rounded-md` 6px (badges, chips, insets) · `rounded-lg` 10px (cards, panels). `rounded-lg` is overridden from Tailwind's 8px default in `input.css`. Other radius utilities are off-scale.
+Three steps, mapped onto Tailwind's radius utilities: `rounded-sm` 4px (buttons, inputs, tabs) · `rounded-md` 6px (badges, chips, insets) · `rounded-lg` 10px (cards, panels). `rounded-lg` is overridden from Tailwind's 8px default in `src/app.css`. Other radius utilities are off-scale.
 
 ## Language
 

@@ -21,7 +21,7 @@ edit `gleam.toml` or `manifest.toml` by hand to do something a command does.
 | Build | `gleam build` |
 | Test | `gleam test` |
 | Format | `gleam format` |
-| Generate the site | `gleam run` |
+| Generate the site into `dist/` | `gleam run build` |
 
 ## Git
 
