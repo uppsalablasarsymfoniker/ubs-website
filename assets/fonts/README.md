@@ -30,15 +30,11 @@ curl -s -A 'Mozilla/5.0' \
 
 Download the `latin` and `latin-ext` woff2 URLs, rename them to the names in
 the table above, and copy the `unicode-range` values into the `@font-face`
-rules in `input.css` — they must match the subset each file was built for, or
-glyphs go missing. Then rebuild:
-
-```sh
-tailwindcss -i priv/static/css/input.css -o priv/static/css/output.css
-```
+rules in `src/app.css` — they must match the subset each file was built for, or
+glyphs go missing. Then rebuild with `gleam run build`.
 
 ## Licence
 
-Both licences are SIL Open Font License 1.1, included verbatim as
+All three licences are SIL Open Font License 1.1, included verbatim as
 `OFL-*.txt`. The OFL requires the licence travel with the font files — keep
 these alongside the woff2s if they move.
