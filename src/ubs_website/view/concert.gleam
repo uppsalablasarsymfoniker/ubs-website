@@ -46,7 +46,14 @@ pub fn list_view(
               english: "No upcoming concerts right now – stay tuned!",
             )),
           ])
-        _ -> cards(site, language, upcoming)
+        [next, ..later] ->
+          html.div([attribute.class("flex flex-col gap-6")], [
+            featured(site, language, next),
+            case later {
+              [] -> element.none()
+              _ -> cards(site, language, later)
+            },
+          ])
       },
     ]),
     case past {
@@ -78,6 +85,10 @@ pub fn list_view(
 
 /// One concert: every performance, the venue, tickets while it is upcoming,
 /// the image, and the description.
+///
+/// The image and the description share the reading column, with the facts
+/// beside them. On narrow screens the facts come between the image and the
+/// description.
 ///
 pub fn detail_view(
   site: Site,
@@ -116,13 +127,32 @@ pub fn detail_view(
         [html.text(text.title)],
       ),
       document.fallback_notice(language, text_language),
-      html.div([attribute.class("mb-8 grid gap-8 md:grid-cols-[2fr_3fr]")], [
-        facts(site, language, concert),
-        image(site, concert.image, text.title, Eager),
-      ]),
-      document.prose(
-        [document.lang_if_different(language, text_language)],
-        text.body,
+      html.div(
+        [
+          attribute.class(
+            "grid gap-8 md:grid-cols-[minmax(0,var(--container-prose))_16rem] md:justify-between",
+          ),
+        ],
+        [
+          image(site, concert.image, text.title, Eager, Whole),
+          html.aside(
+            [
+              attribute.class(
+                "self-start rounded-lg bg-base-200 p-6 md:sticky md:top-8 md:col-start-2 md:row-start-1",
+              ),
+              // Beside both the image and the description, when there is an
+              // image above the description.
+              attribute.classes([
+                #("md:row-span-2", option.is_some(concert.image)),
+              ]),
+            ],
+            [facts(site, language, concert)],
+          ),
+          document.prose(
+            [document.lang_if_different(language, text_language)],
+            text.body,
+          ),
+        ],
       ),
     ]),
   ]
@@ -150,7 +180,7 @@ pub fn featured(
       ),
     ],
     [
-      image(site, concert.image, text.title, Eager),
+      image(site, concert.image, text.title, Eager, Whole),
       html.div([attribute.class("flex flex-col gap-4")], [
         case text_language == language {
           True -> element.none()
@@ -258,7 +288,7 @@ fn card(site: Site, language: Language, concert: Concert) -> Element(a) {
       ),
     ],
     [
-      image(site, concert.image, "", Lazy),
+      image(site, concert.image, "", Lazy, Framed),
       html.div([attribute.class("flex flex-1 flex-col gap-2 p-4")], [
         first_performance(concert.performances, language),
         html.h3(
@@ -366,11 +396,24 @@ type Loading {
   Lazy
 }
 
+/// Concert images are mostly posters with text up to the edges, in any
+/// shape, so they are never cropped.
+///
+type Fit {
+  /// The whole image at its own shape, kept from growing taller than the
+  /// screen.
+  Whole
+  /// The whole image inside a 16:9 frame, so cards in a grid line up. The
+  /// card's own rounded corners clip it.
+  Framed
+}
+
 fn image(
   site: Site,
   path: Option(String),
   alt: String,
   loading: Loading,
+  fit: Fit,
 ) -> Element(a) {
   case path {
     Some(path) ->
@@ -381,7 +424,10 @@ fn image(
           Eager -> "eager"
           Lazy -> "lazy"
         }),
-        attribute.class("aspect-[16/10] w-full rounded-md object-cover"),
+        attribute.class(case fit {
+          Whole -> "h-auto max-h-160 w-auto max-w-full rounded-md"
+          Framed -> "aspect-video w-full bg-neutral object-contain"
+        }),
       ])
     None -> element.none()
   }

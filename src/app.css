@@ -81,6 +81,10 @@
   /* ── Radius (profile §05): sm 4px and md 6px match Tailwind's defaults;
      lg is the profile's 10px rather than Tailwind's 8px. ── */
   --radius-lg: 0.625rem;
+
+  /* ── Reading width: body text, and the images that sit in its column
+     (`max-w-(--container-prose)`; Tailwind's own `max-w-prose` is 65ch). ── */
+  --container-prose: 68ch;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -179,7 +183,7 @@
 
 /* Body text rendered from Markdown, which carries no classes of its own. */
 @utility prose {
-  max-width: 68ch;
+  max-width: var(--container-prose);
 
   & > * + * {
     margin-top: 1em;

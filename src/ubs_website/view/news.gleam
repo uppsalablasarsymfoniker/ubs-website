@@ -69,10 +69,14 @@ pub fn detail_view(
       document.fallback_notice(language, text_language),
       case item.image {
         Some(image) ->
-          html.img([
-            attribute.src(route.asset(site, image)),
-            attribute.alt(""),
-            attribute.class("mb-8 w-full max-w-3xl rounded-md"),
+          html.div([attribute.class("mb-8 max-w-(--container-prose)")], [
+            html.img([
+              attribute.src(route.asset(site, image)),
+              attribute.alt(""),
+              attribute.class(
+                "block h-auto max-h-160 w-auto max-w-full rounded-md",
+              ),
+            ]),
           ])
         None -> element.none()
       },
