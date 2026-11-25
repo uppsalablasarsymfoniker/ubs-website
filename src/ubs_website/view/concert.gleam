@@ -6,7 +6,7 @@ import gleam/option.{type Option, None, Some}
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
-import ubs_website/data/concert.{type Concert, type Performance}
+import ubs_website/data/concert.{type Concert, type Performances}
 import ubs_website/data/entry.{type Text}
 import ubs_website/data/language.{type Language}
 import ubs_website/data/site.{type Site}
@@ -303,7 +303,7 @@ fn facts(site: Site, language: Language, concert: Concert) -> Element(a) {
       ]),
       html.dd(
         [],
-        list.map(concert.performances, fn(performance) {
+        list.map(concert.performance_list(concert), fn(performance) {
           html.p([], [
             date.date_time_view(performance.date, performance.time, language),
           ])
@@ -340,26 +340,26 @@ fn facts(site: Site, language: Language, concert: Concert) -> Element(a) {
   ])
 }
 
+/// The first date, noting when the concert runs over more days.
+///
 fn first_performance(
-  performances: List(Performance),
+  performances: Performances,
   language: Language,
 ) -> Element(a) {
-  case performances {
-    [first, ..rest] ->
-      html.p([attribute.class("label-type text-primary")], [
-        date.view(first.date, language),
-        case list.any(rest, fn(other) { other.date != first.date }) {
-          True ->
-            html.text(language.pick(
-              language,
-              swedish: " med flera",
-              english: " and more",
-            ))
-          False -> element.none()
-        },
-      ])
-    [] -> element.none()
-  }
+  let first = performances.first
+
+  html.p([attribute.class("label-type text-primary")], [
+    date.view(first.date, language),
+    case list.any(performances.rest, fn(other) { other.date != first.date }) {
+      True ->
+        html.text(language.pick(
+          language,
+          swedish: " med flera",
+          english: " and more",
+        ))
+      False -> element.none()
+    },
+  ])
 }
 
 type Loading {
@@ -403,8 +403,5 @@ fn by_year(concerts: List(Concert)) -> List(#(Int, List(Concert))) {
 }
 
 fn year(concert: Concert) -> Int {
-  case concert.performances {
-    [first, ..] -> first.date.year
-    [] -> 0
-  }
+  concert.performances.first.date.year
 }

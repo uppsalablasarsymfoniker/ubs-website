@@ -208,7 +208,7 @@ pub fn date(entry: Entry, field: String) -> Result(Date, Error) {
   }
 }
 
-/// A non-empty list of local date-times, such as a concert's performances.
+/// A list of local date-times, such as a concert's performances.
 ///
 pub fn date_times(
   entry: Entry,
@@ -217,8 +217,7 @@ pub fn date_times(
   let invalid =
     error.ContentInvalidField(entry.path, field, "a list of dates with times")
   case tom.get(entry.fields, [field]) {
-    Ok(tom.Array([])) | Error(_) ->
-      Error(error.ContentMissingField(entry.path, field))
+    Error(_) -> Error(error.ContentMissingField(entry.path, field))
     Ok(tom.Array(values)) ->
       list.try_map(values, fn(value) {
         case value {

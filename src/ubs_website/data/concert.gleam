@@ -17,7 +17,7 @@ import ubs_website/error.{type Error}
 pub type Concert {
   Concert(
     slug: String,
-    performances: List(Performance),
+    performances: Performances,
     venue: String,
     ticket_url: Option(String),
     image: Option(String),
@@ -28,6 +28,14 @@ pub type Concert {
 
 pub type Performance {
   Performance(date: Date, time: TimeOfDay)
+}
+
+/// A concert's performances in time order. Split into the first and the rest
+/// so there is always at least one: a concert without a performance cannot be
+/// constructed.
+///
+pub type Performances {
+  Performances(first: Performance, rest: List(Performance))
 }
 
 pub type Status {
@@ -49,10 +57,14 @@ pub fn load(directory: String) -> Result(List(Concert), Error) {
   use swedish <- result.try(entry.text(source))
   use english <- result.try(entry.optional_text(translations.english))
 
-  let performances =
+  let sorted =
     performances
     |> list.map(fn(performance) { Performance(performance.0, performance.1) })
     |> list.sort(compare_performances)
+  use performances <- result.try(case sorted {
+    [first, ..rest] -> Ok(Performances(first:, rest:))
+    [] -> Error(error.ContentMissingField(source.path, "performances"))
+  })
 
   Ok(Concert(
     slug: translations.slug,
@@ -70,14 +82,21 @@ pub fn load(directory: String) -> Result(List(Concert), Error) {
 /// A concert stays upcoming through the day of its last performance.
 ///
 pub fn status(concert: Concert, today: Date) -> Status {
-  case list.last(concert.performances) {
-    Ok(last) ->
-      case calendar.naive_date_compare(last.date, today) {
-        order.Lt -> Past
-        order.Eq | order.Gt -> Upcoming
-      }
-    Error(Nil) -> Past
+  case calendar.naive_date_compare(last_performance(concert).date, today) {
+    order.Lt -> Past
+    order.Eq | order.Gt -> Upcoming
   }
+}
+
+/// Every performance, in time order.
+///
+pub fn performance_list(concert: Concert) -> List(Performance) {
+  [concert.performances.first, ..concert.performances.rest]
+}
+
+pub fn last_performance(concert: Concert) -> Performance {
+  list.last(concert.performances.rest)
+  |> result.unwrap(concert.performances.first)
 }
 
 /// Upcoming concerts, soonest first.
@@ -97,12 +116,7 @@ pub fn past(concerts: List(Concert), today: Date) -> List(Concert) {
 }
 
 fn compare_first_performance(a: Concert, b: Concert) -> order.Order {
-  case a.performances, b.performances {
-    [a, ..], [b, ..] -> compare_performances(a, b)
-    [], [] -> order.Eq
-    [], _ -> order.Lt
-    _, [] -> order.Gt
-  }
+  compare_performances(a.performances.first, b.performances.first)
 }
 
 fn compare_performances(a: Performance, b: Performance) -> order.Order {
