@@ -1,0 +1,163 @@
+# Sveltia CMS configuration. Field names must match what the Gleam code in
+# src/ubs_website/data/ reads, or the build fails on the next commit.
+# Reference: https://sveltiacms.app/en/docs
+
+backend:
+  name: github
+  repo: uppsalablasarsymfoniker/ubs-website
+  branch: main
+
+media_folder: assets/images/uploads
+public_folder: /images/uploads
+
+media_libraries:
+  default:
+    config:
+      transformations:
+        raster_image:
+          format: webp
+          quality: 85
+          width: 2000
+          height: 2000
+
+i18n:
+  structure: multiple_files
+  locales: [sv, en]
+  default_locale: sv
+
+collections:
+  - name: pages
+    label: Sidor
+    label_singular: Sida
+    i18n: true
+    format: toml-frontmatter
+    files:
+      - name: home
+        label: Hem
+        file: content/pages/home.{{locale}}.md
+        i18n: true
+        fields: &page_fields
+          - { name: title, label: Titel, widget: string, i18n: true }
+          - { name: summary, label: Sammanfattning, widget: text, i18n: true }
+          - { name: body, label: Text, widget: markdown, i18n: true }
+      - name: about
+        label: Om oss
+        file: content/pages/about.{{locale}}.md
+        i18n: true
+        fields: *page_fields
+      - name: join
+        label: Bli medlem
+        file: content/pages/join.{{locale}}.md
+        i18n: true
+        fields: *page_fields
+      - name: booking
+        label: Boka oss
+        file: content/pages/booking.{{locale}}.md
+        i18n: true
+        fields: *page_fields
+      - name: contact
+        label: Kontakt
+        file: content/pages/contact.{{locale}}.md
+        i18n: true
+        fields: *page_fields
+
+  - name: concerts
+    label: Konserter
+    label_singular: Konsert
+    folder: content/concerts
+    extension: md
+    format: toml-frontmatter
+    create: true
+    i18n: true
+    sortable_fields: [title, performances]
+    fields:
+      - { name: title, label: Titel, widget: string, i18n: true, required: [sv] }
+      - name: summary
+        label: Sammanfattning
+        widget: text
+        i18n: true
+        required: [sv]
+      - name: performances
+        label: Föreställningar
+        label_singular: Föreställning
+        widget: list
+        i18n: duplicate
+        min: 1
+        field: { name: performance, label: Datum och tid, widget: datetime }
+      - { name: venue, label: Plats, widget: string, i18n: duplicate }
+      - name: ticket_url
+        label: Biljettlänk
+        widget: string
+        type: url
+        required: false
+        i18n: duplicate
+      - { name: image, label: Bild, widget: image, required: false, i18n: duplicate }
+      - { name: body, label: Text, widget: markdown, i18n: true, required: [sv] }
+
+  - name: news
+    label: Nyheter
+    label_singular: Nyhet
+    folder: content/news
+    extension: md
+    format: toml-frontmatter
+    create: true
+    i18n: true
+    sortable_fields: [title, date]
+    fields:
+      - { name: title, label: Titel, widget: string, i18n: true, required: [sv] }
+      - name: summary
+        label: Sammanfattning
+        widget: text
+        i18n: true
+        required: [sv]
+      - { name: date, label: Datum, widget: datetime, type: date, i18n: duplicate }
+      - { name: image, label: Bild, widget: image, required: false, i18n: duplicate }
+      - { name: body, label: Text, widget: markdown, i18n: true, required: [sv] }
+
+  - name: data
+    label: Inställningar
+    format: toml
+    files:
+      - name: members
+        label: Medlemmar
+        file: content/members.toml
+        fields:
+          - name: members
+            label: Medlemmar
+            label_singular: Medlem
+            widget: list
+            required: false
+            summary: "{{fields.name}} ({{fields.section}})"
+            fields:
+              - { name: name, label: Namn, widget: string }
+              # Keys match section_to_key in src/ubs_website/data/member.gleam.
+              - name: section
+                label: Stämma
+                widget: select
+                options:
+                  - { value: conductor, label: Dirigent }
+                  - { value: flute, label: Flöjt }
+                  - { value: oboe, label: Oboe }
+                  - { value: bassoon, label: Fagott }
+                  - { value: clarinet, label: Klarinett }
+                  - { value: saxophone, label: Saxofon }
+                  - { value: horn, label: Valthorn }
+                  - { value: trumpet, label: Trumpet }
+                  - { value: trombone, label: Trombon }
+                  - { value: euphonium, label: Eufonium }
+                  - { value: tuba, label: Tuba }
+                  - { value: double_bass, label: Kontrabas }
+                  - { value: percussion, label: Slagverk }
+              - { name: role, label: Roll, widget: string, required: false }
+      - name: settings
+        label: Kontaktuppgifter
+        file: content/settings.toml
+        fields:
+          - { name: email, label: E-post, widget: string, type: email }
+          - { name: phone, label: Telefon, widget: string, required: false }
+          - name: postal_address
+            label: Postadress
+            widget: text
+            required: false
+          - { name: facebook, label: Facebook, widget: string, type: url, required: false }
+          - { name: instagram, label: Instagram, widget: string, type: url, required: false }
