@@ -59,7 +59,11 @@ pub fn view(
         ],
         body,
       ),
-      footer(site, settings, language),
+      footer(
+        site,
+        settings,
+        language.pick(language, swedish: "Kontakt", english: "Contact"),
+      ),
     ]),
   ])
 }
@@ -144,7 +148,7 @@ pub fn not_found(site: Site, settings: Settings) -> Element(a) {
           ),
         ],
       ),
-      footer(site, settings, Swedish),
+      footer(site, settings, "Kontakt · Contact"),
     ]),
   ])
 }
@@ -455,7 +459,10 @@ fn language_switch(
 
 // FOOTER ----------------------------------------------------------------------
 
-fn footer(site: Site, settings: Settings, language: Language) -> Element(a) {
+/// The site footer. `heading` names the contact column in the page's language,
+/// or in both on the bilingual 404 page.
+///
+fn footer(site: Site, settings: Settings, heading: String) -> Element(a) {
   html.footer([attribute.class("bg-neutral text-neutral-content")], [
     html.div(
       [
@@ -476,11 +483,7 @@ fn footer(site: Site, settings: Settings, language: Language) -> Element(a) {
         ]),
         html.div([attribute.class("flex flex-col gap-2")], [
           html.h2([attribute.class("label-type font-body text-muted-inverse")], [
-            html.text(language.pick(
-              language,
-              swedish: "Kontakt",
-              english: "Contact",
-            )),
+            html.text(heading),
           ]),
           html.a(
             [
