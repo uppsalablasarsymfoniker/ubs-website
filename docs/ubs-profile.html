@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UBS Graphical Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&family=Source+Code+Pro:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* ── Brand colors ── */
+    --ubs-red: #B2292E;
+    --dark-red: #8B1A2B;
+    --brass: #C4A35A;
+    --black: #1A1A1A;
+
+    /* Two gray tiers: no single gray clears 4.5:1 on both light and dark. */
+    --warm-gray: #6B6460;        /* on light surfaces  — 5.48:1 on warm-white */
+    --warm-gray-light: #8A827D;  /* on dark surfaces   — 4.62:1 on black */
+
+    /* ── Surfaces ── */
+    --warm-white: #FAF8F5;
+    --surface: #F0EEEB;
+    --border: #E0DDD8;
+    --card: #FFFFFF;
+
+    /* ── Type scale ── */
+    --text-h1: 36px;
+    --text-h2: 28px;
+    --text-h3: 20px;
+    --text-body: 16px;
+    --text-small: 13px;
+    --text-label: 11px;
+
+    /* ── Spacing scale (4px base) ── */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* ── Radius scale ── */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 10px;
+
+    /* ── Families ── */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'Source Code Pro', ui-monospace, monospace;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    background: var(--warm-white);
+    color: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Shared label treatment ─────────────────────── */
+
+  .label-type {
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .mono { font-family: var(--font-mono); }
+
+  /* ── Header ─────────────────────────────────────── */
+
+  .header {
+    background: var(--black);
+    padding: var(--space-16) var(--space-8) var(--space-12);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(178,41,46,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 780px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+
+  .header-logo img {
+    height: 56px;
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .header-title {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    font-weight: 700;
+    color: var(--warm-white);
+    letter-spacing: 0.5px;
+    line-height: 1.15;
+  }
+
+  .header-subtitle {
+    color: var(--warm-gray-light);
+    letter-spacing: 3px;
+  }
+
+  .header-rule {
+    width: 48px;
+    height: 2px;
+    background: var(--ubs-red);
+    border: none;
+    margin: var(--space-5) 0 var(--space-4);
+  }
+
+  .header-desc {
+    font-size: var(--text-body);
+    font-weight: 300;
+    color: var(--warm-gray-light);
+    max-width: 460px;
+    line-height: 1.6;
+  }
+
+  /* ── Container & Sections ───────────────────────── */
+
+  .container { max-width: 780px; margin: 0 auto; padding: var(--space-12) var(--space-8) var(--space-16); }
+
+  section { margin-bottom: var(--space-12); }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-3);
+  }
+
+  .section-number {
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    font-weight: 400;
+    color: var(--ubs-red);
+    min-width: 24px;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-h2);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--black);
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--black);
+    margin-bottom: var(--space-3);
+  }
+
+  .section-note {
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: var(--warm-gray);
+    margin-top: calc(var(--space-4) * -1);
+    margin-bottom: var(--space-5);
+  }
+
+  .card-surface {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+
+  /* ── 01 Color Palette ───────────────────────────── */
+
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .swatch {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .swatch:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(26,26,26,0.08);
+    border-color: var(--dark-red);
+  }
+
+  .swatch:focus-visible {
+    outline: 2px solid var(--dark-red);
+    outline-offset: 2px;
+  }
+
+  .swatch-color {
+    height: 88px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: var(--space-3);
+    position: relative;
+  }
+
+  .swatch-hex {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    background: rgba(0,0,0,0.32);
+    color: #fff;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.5px;
+  }
+
+  /* The swatch is a <button>, so its internals are spans — force block flow. */
+  .swatch-info { display: block; padding: var(--space-3) var(--space-4); }
+  .swatch-name { display: block; font-size: var(--text-small); font-weight: 600; color: var(--black); line-height: 1.5; }
+  .swatch-role { display: block; color: var(--warm-gray); margin-top: var(--space-1); }
+  .swatch-usage { display: block; font-size: var(--text-label); font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--warm-gray); margin-top: var(--space-1); line-height: 1.4; }
+  .swatch-cmyk { display: block; font-family: var(--font-mono); font-size: var(--text-label); color: var(--warm-gray); margin-top: var(--space-2); letter-spacing: 0; }
+
+  .swatch-status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+
+  .swatch.flash .swatch-status { opacity: 1; }
+
+  /* ── 02 Pairings ────────────────────────────────── */
+
+  .pair-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .pair-group {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--card);
+  }
+
+  .pair-group-head {
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface);
+    color: var(--warm-gray);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pair-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .pair-sample { font-size: var(--text-small); }
+
+  .pair-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  .pair-ratio { font-family: var(--font-mono); font-size: var(--text-label); opacity: 0.75; }
+
+  .pair-verdict {
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+  }
+
+  .v-pass { background: rgba(128,128,128,0.22); }
+  .v-large { background: rgba(196,163,90,0.30); }
+  .v-fail { background: var(--ubs-red); color: #fff; }
+
+  /* ── 03 Typography ──────────────────────────────── */
+
+  .font-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-4);
+  }
+
+  .font-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .font-name { font-size: var(--text-h3); font-weight: 700; line-height: 1.3; }
+  .font-role { color: var(--warm-gray); }
+  .font-desc { font-size: var(--text-small); line-height: 1.5; color: var(--warm-gray); margin-bottom: var(--space-4); }
+
+  .font-sample {
+    font-size: var(--text-body);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+    background: var(--warm-white);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--ubs-red);
+  }
+
+  .font-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-small);
+    color: var(--warm-gray);
+  }
+
+  .font-meta strong { color: var(--black); }
+
+  .code-chip {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    background: var(--surface);
+    color: var(--warm-gray);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  /* ── 04 Type Scale ──────────────────────────────── */
+
+  .scale-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--surface);
+  }
+
+  .scale-row:last-child { border-bottom: none; }
+
+  .scale-label {
+    color: var(--warm-gray);
+    min-width: 64px;
+    flex-shrink: 0;
+  }
+
+  .scale-spec {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    color: var(--warm-gray);
+    min-width: 132px;
+    flex-shrink: 0;
+    opacity: 0.75;
+    letter-spacing: 0;
+  }
+
+  /* ── 05 Spacing & Radius ────────────────────────── */
+
+  .space-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-2) 0;
+  }
+
+  .space-token { font-family: var(--font-mono); font-size: var(--text-label); color: var(--warm-gray); min-width: 88px; flex-shrink: 0; }
+  .space-px { font-family: var(--font-mono); font-size: var(--text-label); color: var(--warm-gray); min-width: 44px; flex-shrink: 0; opacity: 0.75; }
+  .space-bar { height: 12px; background: var(--ubs-red); opacity: 0.85; }
+
+  .radius-grid { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-4); }
+
+  .radius-demo {
+    width: 88px;
+    height: 64px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    color: var(--warm-gray);
+  }
+
+  /* ── 06 Theme Map ───────────────────────────────── */
+
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+  }
+
+  .theme-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+
+  .theme-table thead { background: var(--surface); }
+
+  .theme-table th {
+    color: var(--warm-gray);
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .theme-table td {
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--surface);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .theme-table tr:last-child td { border-bottom: none; }
+
+  .theme-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    vertical-align: middle;
+    margin-right: var(--space-2);
+  }
+
+  /* ── 07 Logo ────────────────────────────────────── */
+
+  .logo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  .logo-demo {
+    border-radius: var(--radius-lg);
+    padding: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: 160px;
+  }
+
+  .logo-demo-light { background: var(--warm-white); border: 1px solid var(--border); }
+  .logo-demo-dark { background: var(--black); }
+  .logo-demo-red { background: var(--ubs-red); }
+  .logo-demo-brass { background: var(--brass); }
+
+  .logo-demo img {
+    max-width: 140px;
+    height: auto;
+    transition: transform 0.3s ease;
+  }
+
+  .logo-demo:hover img { transform: scale(1.05); }
+
+  .demo-caption {
+    font-size: var(--text-label);
+    text-align: center;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+  }
+
+  .caption-on-light { color: var(--warm-gray); }
+  .caption-on-dark { color: var(--warm-gray-light); }
+  .caption-on-red { color: rgba(255,255,255,0.85); }
+  .caption-on-brass { color: var(--black); }
+
+  /* Clear space diagram */
+
+  .clearspace {
+    margin-top: var(--space-4);
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .clearspace-figure {
+    position: relative;
+    display: inline-block;
+    padding: 14px; /* 25% of the 56px demo logo height */
+    background:
+      repeating-linear-gradient(45deg,
+        var(--surface) 0 6px,
+        transparent 6px 12px);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .clearspace-figure img { display: block; height: 56px; width: auto; }
+
+  .clearspace-inner { outline: 1px solid var(--ubs-red); outline-offset: 0; }
+
+  /* Misuse examples */
+
+  .misuse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .misuse {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    overflow: hidden;
+  }
+
+  .misuse-frame {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .misuse-frame img { height: 40px; width: auto; }
+
+  .misuse-label {
+    font-size: var(--text-label);
+    color: var(--ubs-red);
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .m-rotate img { transform: rotate(-14deg); }
+  .m-stretch img { transform: scaleX(1.7); }
+  .m-recolor img { filter: hue-rotate(115deg) saturate(1.6); }
+  .m-shadow img { filter: drop-shadow(3px 3px 0 var(--brass)); }
+
+  .guideline-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--surface);
+    gap: var(--space-4);
+  }
+
+  .guideline-row:last-child { border-bottom: none; }
+  .guideline-label { font-size: var(--text-small); font-weight: 600; color: var(--black); }
+  .guideline-value { font-size: var(--text-small); color: var(--warm-gray); text-align: right; line-height: 1.5; }
+
+  /* ── Footer ─────────────────────────────────────── */
+
+  .footer {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-8) var(--space-12);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: var(--text-small);
+    color: var(--warm-gray);
+  }
+
+  /* ── Responsive (mobile-first overrides) ────────── */
+
+  @media (max-width: 600px) {
+    .header { padding: var(--space-10) var(--space-5) var(--space-8); }
+    .header-logo img { height: 40px; }
+    .header-title { font-size: var(--text-h2); }
+    .container { padding: var(--space-8) var(--space-5) var(--space-12); }
+    h2 { font-size: var(--text-h3); }
+    .palette-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    .logo-grid { grid-template-columns: 1fr; }
+    .scale-row { flex-direction: column; gap: var(--space-1); }
+    .scale-spec { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────── -->
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <img src="ubs-logo-white.svg" alt="Uppsala Blåsarsymfoniker">
+      <div class="header-text">
+        <h1 class="header-title">Graphical Profile</h1>
+        <span class="header-subtitle label-type" lang="sv">Uppsala Blåsarsymfoniker</span>
+      </div>
+    </div>
+    <hr class="header-rule">
+    <p class="header-desc">Brand guidelines and design tokens for digital and print use. Maintained alongside the Orkestra project.</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ── 01 Color Palette ─────────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2>Color Palette</h2>
+    </div>
+    <p class="section-note">Click any swatch to copy its hex value. CMYK values are uncalibrated sRGB conversions &mdash; always confirm against a printed proof before committing to a print run.</p>
+    <div class="palette-grid" id="swatches"></div>
+  </section>
+
+  <!-- ── 02 Approved Pairings ─────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2>Approved Pairings</h2>
+    </div>
+    <p class="section-note">
+      Contrast ratios are computed live from the palette above, so this table cannot drift from it.
+      <strong>Body + UI</strong> clears WCAG AA at any size (&ge;&nbsp;4.5:1);
+      <strong>large only</strong> is limited to 24px+, or 19px+ bold (&ge;&nbsp;3:1);
+      <strong>avoid</strong> fails AA and must not carry text.
+    </p>
+    <div class="pair-grid" id="pairings"></div>
+  </section>
+
+  <!-- ── 03 Typography ────────────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2>Typography</h2>
+    </div>
+
+    <div class="font-card">
+      <div class="font-header">
+        <span class="font-name" style="font-family:var(--font-display)">Playfair Display</span>
+        <span class="font-role label-type">Display &amp; headings</span>
+      </div>
+      <p class="font-desc">Classical high-contrast serif with elegant proportions. Matches the handwritten character of the UBS logo. Headings only &mdash; the thin hairlines break down below 20px.</p>
+      <div class="font-sample" style="font-family:var(--font-display); font-size:var(--text-h2); font-weight:700; line-height:1.2" lang="sv">Uppsala Blåsarsymfoniker</div>
+      <div class="font-meta">
+        <span>Source: <strong>Google Fonts, self-hosted</strong></span>
+        <span>Weights: <strong>400, 700</strong></span>
+        <span class="code-chip">font-family: 'Playfair Display', Georgia, serif</span>
+      </div>
+    </div>
+
+    <div class="font-card">
+      <div class="font-header">
+        <span class="font-name" style="font-family:var(--font-body)">Source Sans 3</span>
+        <span class="font-role label-type">Body &amp; UI</span>
+      </div>
+      <p class="font-desc">Clean, readable sans-serif for body copy and interface elements. Neutral complement to the expressive display face. Weight 300 is reserved for large intro copy &mdash; never for body text.</p>
+      <div class="font-sample" style="font-family:var(--font-body)" lang="sv">Välkommen till Uppsala Blåsarsymfoniker &ndash; en amatörblåsorkester som erbjuder konserter och musikupplevelser i Uppsala.</div>
+      <div class="font-meta">
+        <span>Source: <strong>Google Fonts, self-hosted</strong></span>
+        <span>Weights: <strong>300, 400, 600</strong></span>
+        <span class="code-chip">font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif</span>
+      </div>
+    </div>
+
+    <div class="font-card">
+      <div class="font-header">
+        <span class="font-name mono">Source Code Pro</span>
+        <span class="font-role label-type">Code &amp; data</span>
+      </div>
+      <p class="font-desc">Monospace face for hex values, tokens, code samples, and tabular figures where column alignment matters.</p>
+      <div class="font-sample mono" style="font-size:var(--text-small)">--color-primary: #B2292E;</div>
+      <div class="font-meta">
+        <span>Source: <strong>Google Fonts, self-hosted</strong></span>
+        <span>Weights: <strong>400</strong></span>
+        <span class="code-chip">font-family: 'Source Code Pro', ui-monospace, monospace</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 Type Scale ────────────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <h2>Type Scale</h2>
+    </div>
+    <p class="section-note">Six steps, hand-tuned rather than modular. Every size on this page comes from this scale &mdash; if a design needs a size that isn't here, extend the scale rather than adding a one-off.</p>
+    <div class="card-surface" id="typeScale"></div>
+  </section>
+
+  <!-- ── 05 Spacing & Radius ──────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <h2>Spacing &amp; Radius</h2>
+    </div>
+    <p class="section-note">Spacing is a 4px base scale, which is Tailwind's default spacing unit, so <span class="code-chip">--space-4</span> equals the utility <span class="code-chip">p-4</span>. Use these steps for component spacing; larger Tailwind steps (20, 24, 32&hellip;) are for page layout. Avoid fractional steps and arbitrary pixel values.</p>
+    <div class="card-surface">
+      <div id="spacingScale"></div>
+      <h3 style="margin-top:var(--space-6)">Corner radius</h3>
+      <p class="font-desc" style="margin:0">
+        Each step is one DaisyUI radius token, and DaisyUI decides which components use it:
+        <strong>4px</strong> <span class="code-chip">--radius-field</span> buttons, inputs, selects, tabs &middot;
+        <strong>6px</strong> <span class="code-chip">--radius-selector</span> badges, checkboxes, toggles &middot;
+        <strong>10px</strong> <span class="code-chip">--radius-box</span> cards, panels, modals, alerts.
+      </p>
+      <div class="radius-grid" id="radiusScale"></div>
+    </div>
+  </section>
+
+  <!-- ── 06 DaisyUI Theme ─────────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <h2>DaisyUI Theme Mapping</h2>
+    </div>
+    <p class="section-note">The <span class="code-chip">data-theme="ubs"</span> theme maps brand colors to DaisyUI semantic tokens. The last three rows are Tailwind <span class="code-chip">@theme</span> tokens for the colors DaisyUI has no slot for.</p>
+    <div class="table-scroll">
+      <table class="theme-table">
+        <thead>
+          <tr>
+            <th class="label-type">Token</th>
+            <th class="label-type">Color</th>
+            <th class="label-type">CSS Variable</th>
+          </tr>
+        </thead>
+        <tbody id="themeMap"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 07 Logo ──────────────────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <h2>Logo</h2>
+    </div>
+
+    <h3>Variants</h3>
+    <p class="section-note" style="margin-top:0">
+      The full-color logo is a single UBS&nbsp;Red fill, which is only 2.69:1 on UBS&nbsp;Black &mdash;
+      below even the 3:1 floor for graphics. Use it on light surfaces only; every dark or saturated
+      background takes a knockout.
+    </p>
+    <div class="logo-grid">
+      <div class="logo-demo logo-demo-light">
+        <img src="ubs-logo.svg" alt="UBS logo, full color on light background">
+        <span class="demo-caption caption-on-light">Full color on light &mdash; <span class="mono">ubs-logo.svg</span></span>
+      </div>
+      <div class="logo-demo logo-demo-dark">
+        <img src="ubs-logo-white.svg" alt="UBS logo, white knockout on black">
+        <span class="demo-caption caption-on-dark">White knockout on black &mdash; <span class="mono">ubs-logo-white.svg</span></span>
+      </div>
+      <div class="logo-demo logo-demo-red">
+        <img src="ubs-logo-white.svg" alt="UBS logo, white knockout on brand red">
+        <span class="demo-caption caption-on-red">White knockout on red &mdash; <span class="mono">ubs-logo-white.svg</span></span>
+      </div>
+      <div class="logo-demo logo-demo-brass">
+        <img src="ubs-logo-black.svg" alt="UBS logo, black knockout on brass">
+        <span class="demo-caption caption-on-brass">Black knockout on brass &mdash; <span class="mono">ubs-logo-black.svg</span></span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:var(--space-6)">Clear space</h3>
+    <div class="clearspace">
+      <div class="clearspace-figure">
+        <img class="clearspace-inner" src="ubs-logo.svg" alt="Clear space diagram: margin equal to 25% of logo height on all sides">
+      </div>
+      <p class="font-desc" style="margin:0; max-width:340px">
+        Keep a margin of at least <strong>25% of the logo's height</strong> free on all four sides.
+        At the 56px header size that is 14px; the hatched area shows the exclusion zone.
+        Nothing &mdash; type, rules, image edges &mdash; may enter it.
+      </p>
+    </div>
+
+    <h3 style="margin-top:var(--space-6)">Incorrect usage</h3>
+    <div class="misuse-grid">
+      <div class="misuse">
+        <div class="misuse-frame m-rotate"><img src="ubs-logo.svg" alt="Incorrect: rotated logo"></div>
+        <span class="misuse-label">&#10007; Never rotate</span>
+      </div>
+      <div class="misuse">
+        <div class="misuse-frame m-stretch"><img src="ubs-logo.svg" alt="Incorrect: horizontally stretched logo"></div>
+        <span class="misuse-label">&#10007; Never stretch</span>
+      </div>
+      <div class="misuse">
+        <div class="misuse-frame m-recolor"><img src="ubs-logo.svg" alt="Incorrect: logo in an off-brand color"></div>
+        <span class="misuse-label">&#10007; Never recolor off-brand</span>
+      </div>
+      <div class="misuse">
+        <div class="misuse-frame m-shadow"><img src="ubs-logo.svg" alt="Incorrect: logo with a drop shadow effect"></div>
+        <span class="misuse-label">&#10007; Never add effects</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:var(--space-6)">Specifications</h3>
+    <div class="card-surface">
+      <div class="guideline-row">
+        <span class="guideline-label">Minimum size</span>
+        <span class="guideline-value">32px height on screen, 10mm in print</span>
+      </div>
+      <div class="guideline-row">
+        <span class="guideline-label">Clear space</span>
+        <span class="guideline-value">25% of logo height on all sides</span>
+      </div>
+      <div class="guideline-row">
+        <span class="guideline-label">File formats</span>
+        <span class="guideline-value">SVG preferred for web &amp; print; PNG only where SVG is unsupported</span>
+      </div>
+      <div class="guideline-row">
+        <span class="guideline-label">Approved variants</span>
+        <span class="guideline-value">Full color on light surfaces only. Elsewhere, one of the two supplied knockouts &mdash; solid white (<span class="mono">ubs-logo-white.svg</span>) or solid black (<span class="mono">ubs-logo-black.svg</span>) &mdash; on a background it clears 4.5:1 against</span>
+      </div>
+      <div class="guideline-row">
+        <span class="guideline-label">Do not</span>
+        <span class="guideline-value">Rotate, stretch, skew, apply any other color, or add shadows, glows, or outlines</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 08 Status Colors ─────────────────────────── -->
+
+  <section>
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <h2>Status Colors</h2>
+    </div>
+    <p class="section-note">
+      Status colors are functional, not brand identity &mdash; they exist to make an
+      outcome legible at a glance. Each one clears WCAG&nbsp;AA both as a fill under
+      light text and as text on the light surfaces; ratios below are computed live,
+      and <strong>Surface</strong> is the governing case because it is the darkest
+      light surface text sits on.
+    </p>
+    <p class="section-note">
+      <strong>Error is deliberately not UBS&nbsp;Red.</strong> The brand red already owns
+      primary actions and Dark Red owns their hover state, so reusing it left a failed
+      save indistinguishable from a save button. Error is the same hue family but
+      brighter and cleaner, which keeps it conventionally readable as an error while
+      separating it from both brand reds.
+      <strong>Warning is the AA-safe sibling of Warm Brass.</strong> Brass is 2.27:1 on
+      light and can never carry text; Warning is the same hue taken dark enough to pass,
+      so a caution reads as brass-family without failing contrast.
+    </p>
+    <div class="pair-grid" id="statusText"></div>
+    <p class="section-note">
+      Color must never be the only signal. Pair every status with a word, an icon, or
+      both &mdash; a red chip and a green chip are the same chip to a color-blind reader.
+      DaisyUI's <span class="code-chip">badge-*</span> and <span class="code-chip">alert-*</span>
+      components consume these tokens automatically.
+    </p>
+  </section>
+
+</div>
+
+<!-- ── Footer ──────────────────────────────────────── -->
+
+<footer class="footer">
+  <span lang="sv">Uppsala Blåsarsymfoniker &mdash; Graphical Profile</span>
+  <span>Version 1.2 &middot; 2026-11-25 &middot; Maintained by the Orkestra project</span>
+</footer>
+
+<script>
+  /* ── Contrast helpers (WCAG 2.1 relative luminance) ─── */
+
+  function channels(hex) {
+    const h = hex.replace('#', '');
+    return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  }
+
+  function luminance(hex) {
+    const [r, g, b] = channels(hex).map(c =>
+      c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  function contrast(a, b) {
+    const la = luminance(a), lb = luminance(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+
+  function cmyk(hex) {
+    const [r, g, b] = channels(hex);
+    const k = 1 - Math.max(r, g, b);
+    if (k >= 1) return 'C0 M0 Y0 K100';
+    const [c, m, y] = [r, g, b].map(v => Math.round((1 - v - k) / (1 - k) * 100));
+    return `C${c} M${m} Y${y} K${Math.round(k * 100)}`;
+  }
+
+  /* ── 01 Palette ─── */
+
+  const palette = [
+    { name: "UBS Red",        hex: "#B2292E", role: "Primary",        usage: "Logo, buttons, links, accents" },
+    { name: "Dark Red",       hex: "#8B1A2B", role: "Primary hover",  usage: "Hover and active states, focus rings" },
+    { name: "Warm Brass",     hex: "#C4A35A", role: "Accent",         usage: "Decorative accents only — never text on light" },
+    { name: "UBS Black",      hex: "#1A1A1A", role: "Secondary",      usage: "Navbar, body text, dark surfaces" },
+    { name: "Warm Gray",      hex: "#6B6460", role: "Muted on light", usage: "Captions and secondary text on light surfaces" },
+    { name: "Warm Gray Lt.",  hex: "#8A827D", role: "Muted on dark",  usage: "Captions and secondary text on dark surfaces" },
+    { name: "Warm White",     hex: "#FAF8F5", role: "Base",           usage: "Page background" },
+    { name: "Surface",        hex: "#F0EEEB", role: "Base raised",    usage: "Table headers, chips, inset panels" },
+    { name: "Border",         hex: "#E0DDD8", role: "Base border",    usage: "Hairlines, card and input borders" },
+    { name: "Card",           hex: "#FFFFFF", role: "Base elevated",  usage: "Cards and elevated panels" },
+    { name: "Error",          hex: "#D01C29", role: "Status error",   usage: "Validation errors, destructive actions, failures" },
+    { name: "Success",        hex: "#246E3A", role: "Status success", usage: "Confirmations, active membership, saved state" },
+    { name: "Warning",        hex: "#8F5D04", role: "Status warning", usage: "Cautions and pending states — the AA-safe brass" },
+    { name: "Info",           hex: "#3E668F", role: "Status info",    usage: "Neutral notices and hints" },
+  ];
+
+  const swatchHost = document.getElementById("swatches");
+
+  palette.forEach(c => {
+    const el = document.createElement("button");
+    el.className = "swatch";
+    el.type = "button";
+    el.setAttribute("aria-label", `Copy ${c.name}, hex ${c.hex}`);
+    /* Pick whichever of black/white reads better on this swatch. */
+    const chipBg = contrast("#FFFFFF", c.hex) >= contrast("#1A1A1A", c.hex)
+      ? "rgba(0,0,0,0.32)" : "rgba(255,255,255,0.45)";
+    const chipFg = contrast("#FFFFFF", c.hex) >= contrast("#1A1A1A", c.hex)
+      ? "#FFFFFF" : "#1A1A1A";
+    el.innerHTML = `
+      <span class="swatch-color" style="background:${c.hex}">
+        <span class="swatch-hex mono" style="background:${chipBg}; color:${chipFg}">${c.hex}</span>
+        <span class="swatch-status"></span>
+      </span>
+      <span class="swatch-info">
+        <span class="swatch-name">${c.name}</span>
+        <span class="swatch-role label-type">${c.role}</span>
+        <span class="swatch-usage label-type">${c.usage}</span>
+        <span class="swatch-cmyk">${cmyk(c.hex)}</span>
+      </span>`;
+
+    const status = el.querySelector(".swatch-status");
+    el.addEventListener("click", async () => {
+      let message = "COPIED";
+      try {
+        await navigator.clipboard.writeText(c.hex);
+      } catch {
+        message = "COPY BLOCKED";
+      }
+      status.textContent = message;
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 900);
+    });
+
+    swatchHost.appendChild(el);
+  });
+
+  /* ── 02 Pairings ─── */
+
+  const byName = Object.fromEntries(palette.map(c => [c.name, c.hex]));
+
+  const pairBackgrounds = [
+    { bg: "Warm White", fgs: ["UBS Black", "Warm Gray", "UBS Red", "Dark Red", "Warm Brass"] },
+    { bg: "Card",       fgs: ["UBS Black", "Warm Gray", "UBS Red", "Dark Red"] },
+    { bg: "Surface",    fgs: ["UBS Black", "Warm Gray", "UBS Red", "Dark Red"] },
+    { bg: "UBS Black",  fgs: ["Warm White", "Warm Gray Lt.", "Warm Brass", "Warm Gray"] },
+    { bg: "UBS Red",    fgs: ["Warm White", "Card", "UBS Black"] },
+    { bg: "Dark Red",   fgs: ["Warm White", "Warm Brass"] },
+    { bg: "Warm Brass", fgs: ["UBS Black", "Dark Red", "Warm White"] },
+    { bg: "Error",      fgs: ["Warm White", "Card"] },
+    { bg: "Success",    fgs: ["Warm White", "Card"] },
+    { bg: "Warning",    fgs: ["Warm White", "Card"] },
+    { bg: "Info",       fgs: ["Warm White", "Card"] },
+  ];
+
+  /* Status colors also have to work as *text* on the light surfaces, which
+     is the tighter constraint — Surface is darker than Warm White, so it
+     governs. Rendered into section 08. */
+  const statusOnLight = ["Error", "Success", "Warning", "Info"];
+
+  const pairHost = document.getElementById("pairings");
+
+  pairBackgrounds.forEach(group => {
+    const bgHex = byName[group.bg];
+    const box = document.createElement("div");
+    box.className = "pair-group";
+
+    const rows = group.fgs.map(fg => {
+      const ratio = contrast(byName[fg], bgHex);
+      const [cls, label] = ratio >= 4.5 ? ["v-pass", "Body + UI"]
+        : ratio >= 3 ? ["v-large", "Large only"]
+        : ["v-fail", "Avoid"];
+      return `
+        <div class="pair-row" style="background:${bgHex}">
+          <span class="pair-sample" style="color:${byName[fg]}">${fg}</span>
+          <span class="pair-meta">
+            <span class="pair-ratio" style="color:${byName[fg]}">${ratio.toFixed(2)}:1</span>
+            <span class="pair-verdict ${cls}" style="${cls === 'v-fail' ? '' : `color:${byName[fg]}`}">${label}</span>
+          </span>
+        </div>`;
+    }).join("");
+
+    box.innerHTML = `<div class="pair-group-head label-type">on ${group.bg}</div>${rows}`;
+    pairHost.appendChild(box);
+  });
+
+  /* ── 08 Status colors as text on light surfaces ─── */
+
+  const statusTextHost = document.getElementById("statusText");
+
+  ["Warm White", "Surface"].forEach(surface => {
+    const bgHex = byName[surface];
+    const box = document.createElement("div");
+    box.className = "pair-group";
+    const rows = statusOnLight.map(name => {
+      const ratio = contrast(byName[name], bgHex);
+      const [cls, label] = ratio >= 4.5 ? ["v-pass", "Body + UI"]
+        : ratio >= 3 ? ["v-large", "Large only"]
+        : ["v-fail", "Avoid"];
+      return `
+        <div class="pair-row" style="background:${bgHex}">
+          <span class="pair-sample" style="color:${byName[name]}">${name}</span>
+          <span class="pair-meta">
+            <span class="pair-ratio" style="color:${byName[name]}">${ratio.toFixed(2)}:1</span>
+            <span class="pair-verdict ${cls}" style="${cls === 'v-fail' ? '' : `color:${byName[name]}`}">${label}</span>
+          </span>
+        </div>`;
+    }).join("");
+    box.innerHTML = `<div class="pair-group-head label-type">as text on ${surface}</div>${rows}`;
+    statusTextHost.appendChild(box);
+  });
+
+  /* ── 04 Type Scale ─── */
+
+  const typeScale = [
+    { label: "H1",    size: 36, family: "var(--font-display)", weight: 700, lh: 1.15, tracking: "0.5px",   text: "Konsert i Uppsala" },
+    { label: "H2",    size: 28, family: "var(--font-display)", weight: 700, lh: 1.2,  tracking: "0",     text: "Program & Repertoar" },
+    { label: "H3",    size: 20, family: "var(--font-display)", weight: 400, lh: 1.3,  tracking: "0",     text: "Om orkestern" },
+    { label: "Body",  size: 16, family: "var(--font-body)",    weight: 400, lh: 1.6,  tracking: "0",     text: "Uppsala Blåsarsymfoniker är en amatörblåsorkester som erbjuder konserter och musikupplevelser." },
+    { label: "Small", size: 13, family: "var(--font-body)",    weight: 400, lh: 1.5,  tracking: "0",     text: "Foto: Uppsala Konsert & Kongress, 2026", color: "var(--warm-gray)" },
+    { label: "Label", size: 11, family: "var(--font-body)",    weight: 600, lh: 1.4,  tracking: "1.5px", text: "Sektion", upper: true, color: "var(--warm-gray)" },
+  ];
+
+  const scaleHost = document.getElementById("typeScale");
+
+  typeScale.forEach(t => {
+    const row = document.createElement("div");
+    row.className = "scale-row";
+    row.innerHTML = `
+      <span class="scale-label label-type">${t.label}</span>
+      <span class="scale-spec">${t.size}px / ${t.lh} / ${t.tracking}</span>
+      <span lang="sv" style="
+        font-family:${t.family};
+        font-size:${t.size}px;
+        font-weight:${t.weight};
+        line-height:${t.lh};
+        letter-spacing:${t.tracking};
+        color:${t.color || "var(--black)"};
+        ${t.upper ? "text-transform:uppercase;" : ""}">${t.text}</span>`;
+    scaleHost.appendChild(row);
+  });
+
+  /* ── 05 Spacing & Radius ─── */
+
+  const spacing = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16];
+  const spacingHost = document.getElementById("spacingScale");
+
+  spacing.forEach(step => {
+    const px = step * 4;
+    const row = document.createElement("div");
+    row.className = "space-row";
+    row.innerHTML = `
+      <span class="space-token">--space-${step}</span>
+      <span class="space-px">${px}px</span>
+      <span class="space-bar" style="width:${px}px"></span>`;
+    spacingHost.appendChild(row);
+  });
+
+  const radii = [
+    { token: "--radius-sm", px: 4,  daisy: "--radius-field",    usage: "buttons, inputs, selects, tabs" },
+    { token: "--radius-md", px: 6,  daisy: "--radius-selector", usage: "badges, checkboxes, toggles, insets" },
+    { token: "--radius-lg", px: 10, daisy: "--radius-box",      usage: "cards, panels, modals, alerts" },
+  ];
+
+  const radiusHost = document.getElementById("radiusScale");
+
+  radii.forEach(r => {
+    const el = document.createElement("div");
+    el.className = "radius-demo";
+    el.style.borderRadius = r.px + "px";
+    el.textContent = `${r.px}px`;
+    el.title = `${r.token} (${r.daisy}) — ${r.usage}`;
+    radiusHost.appendChild(el);
+  });
+
+  /* ── 06 DaisyUI Theme Map ─── */
+
+  const themeTokens = [
+    { token: "primary",           color: "#B2292E", variable: "--color-primary" },
+    { token: "primary-content",   color: "#FFFFFF", variable: "--color-primary-content" },
+    { token: "secondary",         color: "#1A1A1A", variable: "--color-secondary" },
+    { token: "secondary-content", color: "#FAF8F5", variable: "--color-secondary-content" },
+    { token: "accent",            color: "#C4A35A", variable: "--color-accent" },
+    { token: "accent-content",    color: "#1A1A1A", variable: "--color-accent-content" },
+    { token: "neutral",           color: "#1A1A1A", variable: "--color-neutral" },
+    { token: "neutral-content",   color: "#FAF8F5", variable: "--color-neutral-content" },
+    { token: "base-100",          color: "#FAF8F5", variable: "--color-base-100" },
+    { token: "base-200",          color: "#F0EEEB", variable: "--color-base-200" },
+    { token: "base-300",          color: "#E0DDD8", variable: "--color-base-300" },
+    { token: "base-content",      color: "#1A1A1A", variable: "--color-base-content" },
+    { token: "error",             color: "#D01C29", variable: "--color-error" },
+    { token: "error-content",     color: "#FAF8F5", variable: "--color-error-content" },
+    { token: "success",           color: "#246E3A", variable: "--color-success" },
+    { token: "success-content",   color: "#FAF8F5", variable: "--color-success-content" },
+    { token: "warning",           color: "#8F5D04", variable: "--color-warning" },
+    { token: "warning-content",   color: "#FAF8F5", variable: "--color-warning-content" },
+    { token: "info",              color: "#3E668F", variable: "--color-info" },
+    { token: "info-content",      color: "#FAF8F5", variable: "--color-info-content" },
+    { token: "primary-hover",     color: "#8B1A2B", variable: "--color-primary-hover" },
+    { token: "muted",             color: "#6B6460", variable: "--color-muted" },
+    { token: "muted-inverse",     color: "#8A827D", variable: "--color-muted-inverse" },
+  ];
+
+  const themeHost = document.getElementById("themeMap");
+
+  themeTokens.forEach(t => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><strong>${t.token}</strong></td>
+      <td><span class="theme-dot" style="background:${t.color}"></span><span class="mono" style="font-size:var(--text-label)">${t.color}</span></td>
+      <td><span class="code-chip">${t.variable}</span></td>`;
+    themeHost.appendChild(row);
+  });
+</script>
+</body>
+</html>
