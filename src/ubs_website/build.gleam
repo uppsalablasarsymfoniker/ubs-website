@@ -68,7 +68,11 @@ fn pages(
   }
 
   [
-    general(route.Home, pages.home, []),
+    general(
+      route.Home,
+      pages.home,
+      page.home_sections(site, language, content.concerts, content.news),
+    ),
     general(route.About, pages.about, []),
     general(route.Join, pages.join, [page.email_button(settings, language)]),
     general(route.Booking, pages.booking, [

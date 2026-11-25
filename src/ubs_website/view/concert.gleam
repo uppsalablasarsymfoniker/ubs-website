@@ -122,6 +122,64 @@ pub fn detail_view(
   ]
 }
 
+/// The next concert, shown large on the home page.
+///
+pub fn featured(
+  site: Site,
+  language: Language,
+  concert: Concert,
+) -> Element(a) {
+  let #(text, text_language) =
+    language.with_fallback(
+      language,
+      swedish: concert.swedish,
+      english: concert.english,
+    )
+  let href = route.href(site, route.Concert(concert.slug), language)
+
+  html.article(
+    [
+      attribute.class(
+        "grid gap-8 overflow-hidden rounded-lg border border-base-300 bg-card p-6 md:grid-cols-[3fr_2fr]",
+      ),
+    ],
+    [
+      image(site, concert.image, text.title, Eager),
+      html.div(
+        [
+          attribute.class("flex flex-col gap-4"),
+          document.lang_if_different(language, text_language),
+        ],
+        [
+          html.h3([attribute.class("text-h2 font-bold")], [
+            html.a(
+              [attribute.href(href), attribute.class("hover:text-primary")],
+              [
+                html.text(text.title),
+              ],
+            ),
+          ]),
+          case text.summary {
+            Some(summary) -> html.p([], [html.text(summary)])
+            None -> element.none()
+          },
+          facts(site, language, concert),
+          html.a(
+            [attribute.href(href), attribute.class("text-primary underline")],
+            [
+              html.text(language.pick(
+                language,
+                swedish: "Läs mer om konserten",
+                english: "More about the concert",
+              )),
+            ],
+          ),
+        ],
+      ),
+    ],
+  )
+}
+
 pub fn list_meta(language: Language) -> Meta {
   Meta(
     title: title(language),
