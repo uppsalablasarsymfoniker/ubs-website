@@ -27,8 +27,10 @@ edit `gleam.toml` or `manifest.toml` by hand to do something a command does.
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/)
   (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `ci:`).
-- Commit in small steps: one logical change per commit.
-- Commit directly on `main` unless told otherwise.
+- Work directly on `main`. Don't create feature branches or pull requests
+  unless asked.
+- Make small commits as you go: one logical change each, committed as soon
+  as it builds and its tests pass, rather than one large commit at the end.
 
 ## Code style
 
