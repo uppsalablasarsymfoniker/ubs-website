@@ -9,6 +9,7 @@ import ubs_website/data/content.{type Content}
 import ubs_website/data/language.{type Language}
 import ubs_website/data/site.{type Site}
 import ubs_website/error.{type Error}
+import ubs_website/meta/sitemap
 import ubs_website/route.{type Route}
 import ubs_website/tailwind
 import ubs_website/view/concert as concert_view
@@ -34,20 +35,40 @@ pub fn run(site: Site, content: Content, out: String) -> Result(Nil, Error) {
     simplifile.copy_directory("assets", out)
     |> result.map_error(error.AssetsCouldNotBeCopied),
   )
+  let pages = pages(site, content)
   use _ <- result.try(
-    list.try_each(pages(site, content), fn(page) {
+    list.try_each(pages, fn(page) {
       let #(route, language, html) = page
-      write(filepath.join(out, route.file(route, language)), html)
+      write_html(filepath.join(out, route.file(route, language)), html)
     }),
   )
+  use _ <- result.try(write_html(
+    filepath.join(out, "404.html"),
+    document.not_found(site, content.settings),
+  ))
+  let routes =
+    pages
+    |> list.map(fn(page) { page.0 })
+    |> list.unique
+  use _ <- result.try(write(
+    filepath.join(out, "sitemap.xml"),
+    sitemap.from_routes(site, routes),
+  ))
+  use _ <- result.try(write(
+    filepath.join(out, "robots.txt"),
+    sitemap.robots(site),
+  ))
 
   tailwind.run(input: "src/app.css", output: filepath.join(out, "css/site.css"))
 }
 
-fn write(path: String, html: Element(a)) -> Result(Nil, Error) {
-  let html = element.to_document_string(html)
+fn write_html(path: String, html: Element(a)) -> Result(Nil, Error) {
+  write(path, element.to_document_string(html))
+}
+
+fn write(path: String, contents: String) -> Result(Nil, Error) {
   simplifile.create_directory_all(filepath.directory_name(path))
-  |> result.try(fn(_) { simplifile.write(path, html) })
+  |> result.try(fn(_) { simplifile.write(path, contents) })
   |> result.map_error(error.OutputCouldNotBeWritten(path, _))
 }
 

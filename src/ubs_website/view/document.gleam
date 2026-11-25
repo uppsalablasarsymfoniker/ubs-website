@@ -51,7 +51,7 @@ pub fn view(
     head(site, language, meta),
     html.body([attribute.class("flex min-h-screen flex-col")], [
       skip_link(language),
-      header(site, language, meta.route),
+      header(site, language, Some(meta.route)),
       html.main(
         [
           attribute.id("main"),
@@ -84,6 +84,81 @@ pub fn full_title(meta: Meta) -> String {
     | route.News
     | route.NewsItem(_) -> meta.title <> " – " <> site_name
   }
+}
+
+/// The page GitHub Pages serves for any missing path. It is the same file for
+/// both languages, so it speaks both, and every link is absolute.
+///
+pub fn not_found(site: Site, settings: Settings) -> Element(a) {
+  html.html([attribute.lang("sv")], [
+    html.head([], [
+      html.meta([attribute.charset("utf-8")]),
+      html.meta([
+        attribute.name("viewport"),
+        attribute.content("width=device-width, initial-scale=1"),
+      ]),
+      html.title([], "Sidan finns inte – " <> site_name),
+      html.meta([attribute.name("robots"), attribute.content("noindex")]),
+      html.link([
+        attribute.rel("icon"),
+        attribute.type_("image/svg+xml"),
+        attribute.href(route.asset(site, "/images/ubs-logo.svg")),
+      ]),
+      html.link([
+        attribute.rel("stylesheet"),
+        attribute.href(route.asset(site, "/css/site.css")),
+      ]),
+      analytics(site.analytics_token),
+    ]),
+    html.body([attribute.class("flex min-h-screen flex-col")], [
+      header(site, Swedish, None),
+      html.main(
+        [
+          attribute.id("main"),
+          attribute.class(
+            "mx-auto grid w-full max-w-5xl flex-1 gap-12 px-4 py-12 md:grid-cols-2",
+          ),
+        ],
+        [
+          not_found_message(
+            site,
+            Swedish,
+            "Sidan finns inte",
+            "Sidan du letar efter finns inte, eller har flyttat.",
+            "Till startsidan",
+          ),
+          not_found_message(
+            site,
+            English,
+            "Page not found",
+            "The page you are looking for does not exist, or has moved.",
+            "Go to the home page",
+          ),
+        ],
+      ),
+      footer(site, settings, Swedish),
+    ]),
+  ])
+}
+
+fn not_found_message(
+  site: Site,
+  language: Language,
+  title: String,
+  message: String,
+  link: String,
+) -> Element(a) {
+  html.div([attribute.lang(language.code(language))], [
+    html.h1([attribute.class("mb-4 text-h1 font-bold")], [html.text(title)]),
+    html.p([attribute.class("mb-6")], [html.text(message)]),
+    html.a(
+      [
+        attribute.href(route.href(site, route.Home, language)),
+        attribute.class("text-primary underline"),
+      ],
+      [html.text(link)],
+    ),
+  ])
 }
 
 // TRANSLATIONS ----------------------------------------------------------------
@@ -232,7 +307,11 @@ fn skip_link(language: Language) -> Element(a) {
   )
 }
 
-fn header(site: Site, language: Language, current: Route) -> Element(a) {
+fn header(
+  site: Site,
+  language: Language,
+  current: Option(Route),
+) -> Element(a) {
   html.header([attribute.class("border-b border-base-300")], [
     html.div(
       [
@@ -288,10 +367,13 @@ fn header(site: Site, language: Language, current: Route) -> Element(a) {
 fn nav_link(
   site: Site,
   language: Language,
-  current: Route,
+  current: Option(Route),
   target: Route,
 ) -> Element(a) {
-  let is_current = section(current) == section(target)
+  let is_current = case current {
+    Some(current) -> section(current) == section(target)
+    None -> False
+  }
 
   html.a(
     [
@@ -343,7 +425,7 @@ fn nav_label(target: Route, language: Language) -> String {
 fn language_switch(
   site: Site,
   language: Language,
-  current: Route,
+  current: Option(Route),
 ) -> Element(a) {
   let #(other, label) = case language {
     Swedish -> #(English, "English")
@@ -352,7 +434,7 @@ fn language_switch(
 
   html.a(
     [
-      attribute.href(route.href(site, current, other)),
+      attribute.href(route.href(site, option.unwrap(current, route.Home), other)),
       attribute.lang(language.code(other)),
       attribute.attribute("hreflang", language.code(other)),
       attribute.class(
