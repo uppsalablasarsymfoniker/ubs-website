@@ -3,9 +3,11 @@
 Public website for Uppsala Blåsarsymfoniker (UBS), replacing the current
 WordPress/Divi site at uppsalablasarsymfoniker.se (`ubs.nu` redirects there).
 
-Status: milestone 1 (core pages) is done and deployed to the preview at
-https://uppsalablasarsymfoniker.github.io/ubs-website/. Next: milestone 2,
-the CMS. Decisions marked **Proposed** are not yet agreed.
+Status (2026-11-26): milestone 1 (core pages) is done, reviewed, and deployed
+to the preview at https://uppsalablasarsymfoniker.github.io/ubs-website/.
+Next: milestone 2, the CMS — blocked on UBS's Cloudflare account for sign-in.
+See *Implementation status* for what exists, and `docs/handover.md` for how to
+pick up the work. Decisions marked **Proposed** are not yet agreed.
 
 Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 
@@ -111,9 +113,12 @@ Swedish is the default and lives at the site root; English lives under `/en/`.
 - An English listing shows every concert and news item. An item without an
   English translation shows its Swedish text, marked `lang="sv"` and labelled
   "In Swedish".
-- Each page links to its counterpart in the other language, and declares it
-  with `<link rel="alternate" hreflang>`. When there is no English version,
-  the language switch goes to the English section page.
+- Every route exists in both languages, untranslated concerts and news
+  included, so the language switch always links to the same page in the other
+  language, and every page declares both with `<link rel="alternate"
+  hreflang>`.
+- `lang="sv"` goes on the Swedish title, summary, and body only — never on
+  the English navigation, labels, and dates around them.
 
 | Swedish | English |
 |---|---|
@@ -143,10 +148,13 @@ src/
     site.gleam          where the site is published (SITE_URL) and when built
     route.gleam         every page's path in each language
     tailwind.gleam      runs Tailwind through glailglind
-    data/               content types and loading: page, concert, news,
-                        member, settings, date, markdown
-    view/               document shell, layout, and the page views
-    meta/               sitemap
+    data/               what the content is, and loading it from content/:
+                        entry (front matter + Markdown), content (all of it),
+                        language, page, concert, news, member, settings
+    view/               how it looks: document (shell, header, footer, 404),
+                        page (general pages, home sections), concert, news,
+                        member, date
+    meta/               sitemap.xml and robots.txt
 test/                   gleeunit tests
 assets/                 copied to dist/ as is
   admin/              Sveltia: index.html + config.yml
@@ -263,7 +271,8 @@ Setup, once UBS has a Cloudflare account:
 ## Pages
 
 Header: logo and name, navigation (Konserter, Nyheter, Om oss, Bli medlem,
-Boka oss, Kontakt), language switch. Collapses to a menu on narrow screens.
+Boka oss, Kontakt), language switch. On narrow screens the navigation wraps
+below the logo; no JavaScript menu.
 Footer: contact details and social links from `settings`.
 
 | Page | Content |
@@ -280,8 +289,9 @@ Footer: contact details and social links from `settings`.
 | 404 | Both languages on one page, with links home |
 
 There are no recent photos of the orchestra, so the design must not depend on
-one: a typographic home page, and an Open Graph image built from the logo and
-name. A photo can be added later without a redesign.
+one: a typographic home page. Link previews use the concert's or news item's
+image, otherwise the logo PNG; a designed Open Graph image with the logo and
+name is a later follow-up. A photo can be added later without a redesign.
 
 Every page has a `<title>`, a meta description, and Open Graph tags; the build
 writes `sitemap.xml` with both languages. Dates are formatted per language
@@ -319,11 +329,14 @@ Static hosting has no server to receive a form post. Options, simplest first:
   editor can fix it from the CI log. The build never crashes on content.
 - `gleam test` covers content parsing, the language fallback rules, routing,
   and date formatting.
-- GitHub Actions on push to `main`, daily at 03:00, and on demand: set up
+- GitHub Actions on push to `main`, daily at 02:00 UTC, and on demand: set up
   Erlang and Gleam (`erlef/setup-beam`), test, build, deploy with
   `actions/deploy-pages`.
 - Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` (GitHub Pages)
   until the domain moves.
+- The deploy step occasionally fails with "No artifacts named github-pages
+  were found" although the upload succeeded — a GitHub-side flake seen twice
+  in the first runs. Re-run the workflow (`gh run rerun <id>`).
 
 ### Hosting: GitHub Pages or Cloudflare
 
@@ -455,6 +468,37 @@ The profile is written for an app UI. A public site will likely need more:
 image treatment, hero layouts, a larger display size for the home page.
 Extend the profile first, then the code.
 
+## Implementation status
+
+**Milestone 1 — done.**
+
+- `gleam run build` renders 17 routes in both languages (34 pages), a
+  bilingual 404, `sitemap.xml`, and `robots.txt` into `dist/`, copies
+  `assets/`, and compiles the CSS through the pinned Tailwind.
+- Content from *Core content* is migrated: five general pages in both
+  languages, eight concerts from 2025 onward with WebP/AVIF images, two news
+  items, contact settings, and an empty member list.
+- Content errors fail the build with the file named: missing or invalid
+  fields, invalid front matter or TOML, a general page without English, an
+  English file without a Swedish one, and misnamed files in a collection.
+- A concert always has at least one performance — enforced by the
+  `Performances(first, rest)` type, checked once in `concert.load`.
+- 29 tests: content parsing and errors, the real `content/` folder loading,
+  routes and base path, the Swedish fallback and its `lang` marking, date
+  formatting, concert status and order, member sections, and the sitemap.
+- Reviewed with the `gleam-reviewer` agent against the official Gleam
+  conventions; all findings fixed.
+- GitHub Actions deploys on push, daily at 02:00 UTC, and on demand.
+
+**Waiting on the board:** review of the new join and booking text and of all
+English translations; confirmation of the phone number and postal address;
+the conductor-search news is dated 2026-11-01 (when it appeared on the home
+page — the real date is unknown); members' consent for the member list.
+
+**Not started:** milestone 2 (CMS: `assets/admin/` does not exist yet),
+analytics token (set the `CLOUDFLARE_ANALYTICS_TOKEN` repository variable),
+milestones 3–5.
+
 ## Open questions
 
 - Who owns UBS's Cloudflare account? It blocks CMS sign-in, analytics,
@@ -469,7 +513,7 @@ Extend the profile first, then the code.
 
 ## Milestones
 
-1. **Core pages** — one small commit per step:
+1. **Core pages** — **done.** One small commit per step:
    1. Gleam project (`gleam new`, `gleam add`), CLAUDE.md commands.
    2. Content loading: front matter, Markdown, both languages, errors.
    3. Layout, CSS tokens, fonts, logos.
