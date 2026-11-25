@@ -164,9 +164,12 @@ module. Unlike that site, the build returns errors rather than asserting, per
 Build: `gleam run build`. A `serve` command with live reload, like
 `hayleigh.dev`'s, is a later follow-up; until then, preview `dist/` with any
 static file server.
-`BASE_PATH` sets the URL prefix (e.g. `/ubs-website` for the GitHub Pages
-project URL); it defaults to the domain root. Every internal link and asset
-URL goes through one path helper so both work.
+`SITE_URL` sets the public address, including any path the site lives under
+(e.g. `https://uppsalablasarsymfoniker.github.io/ubs-website` for the GitHub
+Pages project URL); without it the build targets `http://localhost:8000`.
+Every internal link and asset URL goes through `route.gleam`, which adds the
+path, so the site works both at a domain root and under a project path.
+`CLOUDFLARE_ANALYTICS_TOKEN` adds the analytics script when set.
 
 ## Content model
 
