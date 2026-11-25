@@ -3,7 +3,9 @@
 Public website for Uppsala Blåsarsymfoniker (UBS), replacing the current
 WordPress/Divi site at uppsalablasarsymfoniker.se (`ubs.nu` redirects there).
 
-Status: planning. Decisions marked **Proposed** are not yet agreed.
+Status: milestone 1 (core pages) is done and deployed to the preview at
+https://uppsalablasarsymfoniker.github.io/ubs-website/. Next: milestone 2,
+the CMS. Decisions marked **Proposed** are not yet agreed.
 
 Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 
