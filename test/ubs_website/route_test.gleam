@@ -1,8 +1,8 @@
 import gleam/option.{None}
 import gleam/time/calendar
 import ubs_website/data/language.{English, Swedish}
-import ubs_website/data/site
 import ubs_website/route
+import ubs_website/site
 
 fn site(url: String) -> site.Site {
   site.new(

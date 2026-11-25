@@ -10,8 +10,8 @@ import ubs_website/data/entry.{type Text}
 import ubs_website/data/language.{type Language}
 import ubs_website/data/news.{type NewsItem}
 import ubs_website/data/settings.{type Settings}
-import ubs_website/data/site.{type Site}
 import ubs_website/route.{type Route}
+import ubs_website/site.{type Site}
 import ubs_website/view/concert as concert_view
 import ubs_website/view/document.{type Meta, Meta}
 import ubs_website/view/news as news_view

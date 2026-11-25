@@ -3,8 +3,8 @@
 import gleam/list
 import gleam/string
 import ubs_website/data/language
-import ubs_website/data/site.{type Site}
 import ubs_website/route.{type Route}
+import ubs_website/site.{type Site}
 
 // CONSTRUCTORS ----------------------------------------------------------------
 

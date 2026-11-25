@@ -1,9 +1,9 @@
 import gleam/option.{None}
 import gleam/string
 import gleam/time/calendar
-import ubs_website/data/site
 import ubs_website/meta/sitemap
 import ubs_website/route
+import ubs_website/site
 
 pub fn sitemap_lists_both_languages_test() {
   let site =

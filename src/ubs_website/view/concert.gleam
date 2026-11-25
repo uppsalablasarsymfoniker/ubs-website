@@ -8,8 +8,8 @@ import lustre/element.{type Element}
 import lustre/element/html
 import ubs_website/data/concert.{type Concert, type Performances}
 import ubs_website/data/language.{type Language}
-import ubs_website/data/site.{type Site}
 import ubs_website/route
+import ubs_website/site.{type Site}
 import ubs_website/view/date
 import ubs_website/view/document.{type Meta, Meta}
 

@@ -2,7 +2,7 @@
 
 import gleam/string
 import ubs_website/data/language.{type Language, English, Swedish}
-import ubs_website/data/site.{type Site}
+import ubs_website/site.{type Site}
 
 // TYPES -----------------------------------------------------------------------
 

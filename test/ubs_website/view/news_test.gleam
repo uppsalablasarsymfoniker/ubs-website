@@ -5,7 +5,7 @@ import lustre/element
 import ubs_website/data/entry
 import ubs_website/data/language.{English}
 import ubs_website/data/news.{NewsItem}
-import ubs_website/data/site
+import ubs_website/site
 import ubs_website/view/news as news_view
 
 fn untranslated_item() -> news.NewsItem {

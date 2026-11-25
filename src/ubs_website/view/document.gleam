@@ -7,8 +7,8 @@ import lustre/element.{type Element}
 import lustre/element/html
 import ubs_website/data/language.{type Language, English, Swedish}
 import ubs_website/data/settings.{type Settings}
-import ubs_website/data/site.{type Site}
 import ubs_website/route.{type Route}
+import ubs_website/site.{type Site}
 
 // TYPES -----------------------------------------------------------------------
 

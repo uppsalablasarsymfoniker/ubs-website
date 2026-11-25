@@ -140,6 +140,8 @@ src/
   ubs_website/
     build.gleam         renders every route and writes dist/
     error.gleam         one error type for everything the build can fail on
+    site.gleam          where the site is published (SITE_URL) and when built
+    route.gleam         every page's path in each language
     tailwind.gleam      runs Tailwind through glailglind
     data/               content types and loading: page, concert, news,
                         member, settings, date, markdown
