@@ -395,7 +395,10 @@ fn nav_link(
         True -> attribute.attribute("aria-current", "page")
         False -> attribute.none()
       },
-      attribute.classes([#("text-primary font-semibold", is_current)]),
+      // Weight stays the same, so the links don't shift from page to page.
+      attribute.classes([
+        #("text-primary underline decoration-2 underline-offset-8", is_current),
+      ]),
     ],
     [html.text(nav_label(target, language))],
   )
