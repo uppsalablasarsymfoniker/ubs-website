@@ -32,7 +32,7 @@ pub fn view(text: Text, after: List(Element(a))) -> List(Element(a)) {
 pub fn meta(text: Text, route: Route) -> Meta {
   Meta(
     title: text.title,
-    description: description(text.summary),
+    description: option.unwrap(text.summary, ""),
     route:,
     image: None,
   )
@@ -115,13 +115,6 @@ fn external_link(url: String) -> Element(a) {
   html.a([attribute.href(url), attribute.class("text-primary underline")], [
     html.text(url),
   ])
-}
-
-fn description(summary: Option(String)) -> String {
-  case summary {
-    Some(summary) -> summary
-    None -> ""
-  }
 }
 
 // HOME ------------------------------------------------------------------------

@@ -107,10 +107,7 @@ pub fn detail_meta(language: Language, item: NewsItem) -> Meta {
 
   Meta(
     title: text.title,
-    description: case text.summary {
-      Some(summary) -> summary
-      None -> ""
-    },
+    description: option.unwrap(text.summary, ""),
     route: route.NewsItem(item.slug),
     image: item.image,
   )

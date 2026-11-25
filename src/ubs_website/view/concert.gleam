@@ -7,7 +7,6 @@ import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import ubs_website/data/concert.{type Concert, type Performances}
-import ubs_website/data/entry.{type Text}
 import ubs_website/data/language.{type Language}
 import ubs_website/data/site.{type Site}
 import ubs_website/route
@@ -217,7 +216,7 @@ pub fn detail_meta(language: Language, concert: Concert) -> Meta {
 
   Meta(
     title: text.title,
-    description: summary(text),
+    description: option.unwrap(text.summary, ""),
     route: route.Concert(concert.slug),
     image: concert.image,
   )
@@ -386,10 +385,6 @@ fn image(
       ])
     None -> element.none()
   }
-}
-
-fn summary(text: Text) -> String {
-  option.unwrap(text.summary, "")
 }
 
 fn by_year(concerts: List(Concert)) -> List(#(Int, List(Concert))) {
