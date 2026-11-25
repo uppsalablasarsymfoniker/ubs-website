@@ -5,7 +5,7 @@ import ubs_website/meta/sitemap
 import ubs_website/route
 import ubs_website/site
 
-pub fn sitemap_lists_both_languages_test() {
+pub fn sitemap_lists_both_languages_test() -> Nil {
   let site =
     site.new(
       url: "https://example.org/ubs-website",

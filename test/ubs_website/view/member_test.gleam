@@ -5,11 +5,11 @@ import ubs_website/data/language.{English, Swedish}
 import ubs_website/data/member.{Member}
 import ubs_website/view/member as member_view
 
-pub fn empty_list_shows_nothing_test() {
+pub fn empty_list_shows_nothing_test() -> Nil {
   assert element.to_string(member_view.view(Swedish, [])) == ""
 }
 
-pub fn sections_in_orchestra_order_test() {
+pub fn sections_in_orchestra_order_test() -> Nil {
   let html =
     member_view.view(English, [
       Member("Tuba Player", member.Tuba, None),

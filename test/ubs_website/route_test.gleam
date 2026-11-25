@@ -12,7 +12,7 @@ fn site(url: String) -> site.Site {
   )
 }
 
-pub fn paths_per_language_test() {
+pub fn paths_per_language_test() -> Nil {
   assert route.path(route.Home, Swedish) == "/"
   assert route.path(route.Home, English) == "/en/"
   assert route.path(route.About, Swedish) == "/om-oss/"
@@ -20,7 +20,7 @@ pub fn paths_per_language_test() {
   assert route.path(route.NewsItem("y"), Swedish) == "/nyheter/y/"
 }
 
-pub fn links_include_the_base_path_test() {
+pub fn links_include_the_base_path_test() -> Nil {
   let preview = site("https://uppsalablasarsymfoniker.github.io/ubs-website/")
 
   assert preview.base_path == "/ubs-website"
@@ -32,14 +32,14 @@ pub fn links_include_the_base_path_test() {
     == "/ubs-website/images/ubs-logo.svg"
 }
 
-pub fn domain_root_has_no_base_path_test() {
+pub fn domain_root_has_no_base_path_test() -> Nil {
   let live = site("https://www.uppsalablasarsymfoniker.se")
 
   assert live.base_path == ""
   assert route.href(live, route.Home, Swedish) == "/"
 }
 
-pub fn output_files_test() {
+pub fn output_files_test() -> Nil {
   assert route.file(route.Home, Swedish) == "index.html"
   assert route.file(route.Booking, English) == "en/book-us/index.html"
 }

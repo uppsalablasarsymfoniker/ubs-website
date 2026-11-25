@@ -14,19 +14,19 @@ performances = [2027-01-30T15:00:00.000, 2027-01-30T19:00:00]
 Med **Trio X**.
 "
 
-pub fn parse_reads_fields_and_body_test() {
+pub fn parse_reads_fields_and_body_test() -> Nil {
   let assert Ok(concert) = entry.parse("concert.sv.md", concert)
 
   assert entry.string(concert, "title") == Ok("Januarikalaset")
   assert entry.body_to_html(concert) == "<p>Med <strong>Trio X</strong>.</p>\n"
 }
 
-pub fn parse_requires_front_matter_test() {
+pub fn parse_requires_front_matter_test() -> Nil {
   assert entry.parse("page.sv.md", "# Rubrik")
     == Error(error.ContentMissingFrontMatter("page.sv.md"))
 }
 
-pub fn empty_string_counts_as_missing_test() {
+pub fn empty_string_counts_as_missing_test() -> Nil {
   let assert Ok(concert) = entry.parse("concert.sv.md", concert)
 
   assert entry.optional_string(concert, "summary") == Ok(None)
@@ -34,7 +34,7 @@ pub fn empty_string_counts_as_missing_test() {
     == Error(error.ContentMissingField("concert.sv.md", "summary"))
 }
 
-pub fn date_times_accept_cms_milliseconds_test() {
+pub fn date_times_accept_cms_milliseconds_test() -> Nil {
   let assert Ok(concert) = entry.parse("concert.sv.md", concert)
   let assert Ok([#(date, first), #(_, second)]) =
     entry.date_times(concert, "performances")
@@ -44,7 +44,7 @@ pub fn date_times_accept_cms_milliseconds_test() {
   assert second.hours == 19
 }
 
-pub fn tables_name_their_position_test() {
+pub fn tables_name_their_position_test() -> Nil {
   let source = "+++\n+++\n"
   let assert Ok(empty) = entry.parse("members.toml", source)
   assert entry.tables(empty, "members") == Ok([])
@@ -63,7 +63,7 @@ pub fn tables_name_their_position_test() {
     == Error(error.ContentMissingField("members.toml (members #2)", "name"))
 }
 
-pub fn read_collection_pairs_translations_test() {
+pub fn read_collection_pairs_translations_test() -> Nil {
   let directory = "build/test-content/concerts"
   let _ = simplifile.delete(directory)
   let assert Ok(_) = simplifile.create_directory_all(directory)

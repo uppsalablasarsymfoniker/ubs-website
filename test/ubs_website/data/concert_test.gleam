@@ -30,13 +30,13 @@ fn concert(slug: String, days: List(Int)) -> Concert {
 
 const today = calendar.Date(2026, calendar.November, 25)
 
-pub fn concert_is_upcoming_through_its_last_day_test() {
+pub fn concert_is_upcoming_through_its_last_day_test() -> Nil {
   assert concert.status(concert("today", [25]), today) == concert.Upcoming
   assert concert.status(concert("run", [24, 26]), today) == concert.Upcoming
   assert concert.status(concert("yesterday", [24]), today) == concert.Past
 }
 
-pub fn upcoming_soonest_first_and_past_newest_first_test() {
+pub fn upcoming_soonest_first_and_past_newest_first_test() -> Nil {
   let concerts = [
     concert("c", [28]),
     concert("a", [1]),
