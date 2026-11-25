@@ -63,8 +63,8 @@ diff, and add the things neither source states outright:
 - **Content errors fail the build, never crash it.** A missing field, bad
   front matter, or a general page without its English translation must come
   back as a `content.ContentError` naming the file, so an editor can fix it
-  from the CI log. `let assert` and `panic` belong only in `src/ubs_website.gleam`
-  turning a top-level `Error` into a non-zero exit, and in `test/`.
+  from the CI log. `let assert` and `panic` belong only in `test/`; the entry
+  point turns a top-level `Error` into a message and a non-zero exit.
 - **Every internal link goes through the base path.** Hrefs and asset URLs
   are built with the site's path helper so the site works both at a domain
   root and under a GitHub Pages project path. A literal `"/konserter/"` in an
