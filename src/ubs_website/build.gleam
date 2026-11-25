@@ -30,7 +30,7 @@ pub fn main() -> Result(Nil, Error) {
 }
 
 pub fn run(site: Site, content: Content, out: String) -> Result(Nil, Error) {
-  let _ = simplifile.delete(out)
+  use _ <- result.try(clear(out))
   use _ <- result.try(
     simplifile.copy_directory("assets", out)
     |> result.map_error(error.AssetsCouldNotBeCopied),
@@ -60,6 +60,16 @@ pub fn run(site: Site, content: Content, out: String) -> Result(Nil, Error) {
   ))
 
   tailwind.run(input: "src/app.css", output: filepath.join(out, "css/site.css"))
+}
+
+/// Remove the previous build, so a page whose content was deleted is not
+/// published again. A missing folder is fine.
+///
+fn clear(out: String) -> Result(Nil, Error) {
+  case simplifile.delete(out) {
+    Ok(Nil) | Error(simplifile.Enoent) -> Ok(Nil)
+    Error(reason) -> Error(error.OutputCouldNotBeCleared(out, reason))
+  }
 }
 
 fn write_html(path: String, html: Element(a)) -> Result(Nil, Error) {

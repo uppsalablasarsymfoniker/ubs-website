@@ -21,6 +21,7 @@ pub type Error {
   ContentMissingTranslation(path: String)
   ContentMissingSwedish(path: String)
   ContentUnknownSection(path: String, section: String)
+  OutputCouldNotBeCleared(path: String, reason: simplifile.FileError)
   OutputCouldNotBeWritten(path: String, reason: simplifile.FileError)
   AssetsCouldNotBeCopied(reason: simplifile.FileError)
   StylesCouldNotBeBuilt(reason: String)
@@ -59,6 +60,11 @@ pub fn to_string(error: Error) -> String {
       <> " has no Swedish version. Swedish is required; English is optional."
     ContentUnknownSection(path:, section:) ->
       path <> ": unknown section `" <> section <> "`."
+    OutputCouldNotBeCleared(path:, reason:) ->
+      "Could not remove the previous build in "
+      <> path
+      <> ": "
+      <> simplifile.describe_error(reason)
     OutputCouldNotBeWritten(path:, reason:) ->
       "Could not write " <> path <> ": " <> simplifile.describe_error(reason)
     AssetsCouldNotBeCopied(reason:) ->
