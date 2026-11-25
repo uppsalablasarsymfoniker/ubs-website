@@ -1,9 +1,8 @@
 +++
 title = "Öppen repetition inför EM i Stuttgart"
 summary = "Vi framför hela tävlingsprogrammet inför European Championship for Wind Orchestras. Fri entré."
-performances = [ 2026-11-12T20:30:00.000 ]
+performances = [ 2026-11-12T20:00:00.000 ]
 venue = "Brantingsskolans aula"
-ticket_url = ""
 image = "/images/concerts/2026-11-12-oppen-repetition.webp"
 +++
 
