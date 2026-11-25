@@ -13,6 +13,7 @@ import ubs_website/route.{type Route}
 import ubs_website/tailwind
 import ubs_website/view/concert as concert_view
 import ubs_website/view/document
+import ubs_website/view/news as news_view
 import ubs_website/view/page
 
 // MAIN ------------------------------------------------------------------------
@@ -80,11 +81,23 @@ fn pages(
       concert_view.list_meta(language),
       concert_view.list_view(site, language, content.concerts),
     ),
-    ..list.map(content.concerts, fn(concert) {
-      render(
-        concert_view.detail_meta(language, concert),
-        concert_view.detail_view(site, language, concert),
-      )
-    })
+    render(
+      news_view.list_meta(language),
+      news_view.list_view(site, language, content.news),
+    ),
+    ..list.append(
+      list.map(content.concerts, fn(concert) {
+        render(
+          concert_view.detail_meta(language, concert),
+          concert_view.detail_view(site, language, concert),
+        )
+      }),
+      list.map(content.news, fn(item) {
+        render(
+          news_view.detail_meta(language, item),
+          news_view.detail_view(site, language, item),
+        )
+      }),
+    )
   ]
 }

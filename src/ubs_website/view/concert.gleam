@@ -8,7 +8,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 import ubs_website/data/concert.{type Concert, type Performance}
 import ubs_website/data/entry.{type Text}
-import ubs_website/data/language.{type Language, English, Swedish}
+import ubs_website/data/language.{type Language}
 import ubs_website/data/site.{type Site}
 import ubs_website/route
 import ubs_website/view/date
@@ -93,7 +93,7 @@ pub fn detail_view(
     )
 
   [
-    html.article([lang_if_different(language, text_language)], [
+    html.article([document.lang_if_different(language, text_language)], [
       html.p([attribute.class("mb-4")], [
         html.a(
           [
@@ -112,7 +112,7 @@ pub fn detail_view(
       html.h1([attribute.class("mb-6 text-h1 font-bold")], [
         html.text(text.title),
       ]),
-      fallback_notice(language, text_language),
+      document.fallback_notice(language, text_language),
       html.div([attribute.class("mb-8 grid gap-8 md:grid-cols-[2fr_3fr]")], [
         facts(site, language, concert),
         image(site, concert.image, text.title, Eager),
@@ -193,7 +193,7 @@ fn card(site: Site, language: Language, concert: Concert) -> Element(a) {
         html.h3(
           [
             attribute.class("text-h3 font-bold"),
-            lang_if_different(language, text_language),
+            document.lang_if_different(language, text_language),
           ],
           [
             html.a(
@@ -214,7 +214,7 @@ fn card(site: Site, language: Language, concert: Concert) -> Element(a) {
         ]),
         case text_language == language {
           True -> element.none()
-          False -> in_swedish_label()
+          False -> document.in_swedish_label()
         },
       ]),
     ],
@@ -313,38 +313,6 @@ fn image(
         attribute.class("aspect-[16/10] w-full rounded-md object-cover"),
       ])
     None -> element.none()
-  }
-}
-
-fn fallback_notice(language: Language, text_language: Language) -> Element(a) {
-  case language, text_language {
-    English, Swedish ->
-      html.p([attribute.class("mb-6"), attribute.lang("en")], [
-        in_swedish_label(),
-      ])
-    English, English | Swedish, _ -> element.none()
-  }
-}
-
-fn in_swedish_label() -> Element(a) {
-  html.span(
-    [
-      attribute.lang("en"),
-      attribute.class(
-        "inline-block self-start rounded-md bg-base-200 px-2 py-1 text-small text-muted",
-      ),
-    ],
-    [html.text("In Swedish")],
-  )
-}
-
-fn lang_if_different(
-  page_language: Language,
-  text_language: Language,
-) -> attribute.Attribute(a) {
-  case page_language == text_language {
-    True -> attribute.none()
-    False -> attribute.lang(language.code(text_language))
   }
 }
 

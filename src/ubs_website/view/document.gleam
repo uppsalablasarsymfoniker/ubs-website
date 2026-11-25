@@ -86,6 +86,47 @@ pub fn full_title(meta: Meta) -> String {
   }
 }
 
+// TRANSLATIONS ----------------------------------------------------------------
+
+/// A note on an English page whose text is only available in Swedish.
+///
+pub fn fallback_notice(
+  language: Language,
+  text_language: Language,
+) -> Element(a) {
+  case language, text_language {
+    English, Swedish ->
+      html.p([attribute.class("mb-6"), attribute.lang("en")], [
+        in_swedish_label(),
+      ])
+    English, English | Swedish, _ -> element.none()
+  }
+}
+
+pub fn in_swedish_label() -> Element(a) {
+  html.span(
+    [
+      attribute.lang("en"),
+      attribute.class(
+        "inline-block self-start rounded-md bg-base-200 px-2 py-1 text-small text-muted",
+      ),
+    ],
+    [html.text("In Swedish")],
+  )
+}
+
+/// `lang` for text in another language than the page around it.
+///
+pub fn lang_if_different(
+  page_language: Language,
+  text_language: Language,
+) -> attribute.Attribute(a) {
+  case page_language == text_language {
+    True -> attribute.none()
+    False -> attribute.lang(language.code(text_language))
+  }
+}
+
 // HEAD ------------------------------------------------------------------------
 
 fn head(site: Site, language: Language, meta: Meta) -> Element(a) {
