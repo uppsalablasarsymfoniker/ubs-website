@@ -1,3 +1,7 @@
+// IMPORTS ---------------------------------------------------------------------
+
+import gleam/option.{type Option, None, Some}
+
 // TYPES -----------------------------------------------------------------------
 
 pub type Language {
@@ -40,4 +44,19 @@ pub fn pick(language: Language, swedish swedish: a, english english: a) -> a {
 
 pub fn get(translated: Translated(a), language: Language) -> a {
   pick(language, swedish: translated.swedish, english: translated.english)
+}
+
+/// The value in the requested language when there is one, otherwise the
+/// Swedish value, together with the language actually returned — so the view
+/// can mark Swedish text on an English page with `lang="sv"`.
+///
+pub fn with_fallback(
+  language: Language,
+  swedish swedish: a,
+  english english: Option(a),
+) -> #(a, Language) {
+  case language, english {
+    English, Some(english) -> #(english, English)
+    English, None | Swedish, _ -> #(swedish, Swedish)
+  }
 }
