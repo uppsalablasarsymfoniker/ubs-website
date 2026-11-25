@@ -1,0 +1,377 @@
+// IMPORTS ---------------------------------------------------------------------
+
+import gleam/list
+import gleam/option.{type Option, None, Some}
+import lustre/attribute
+import lustre/element.{type Element}
+import lustre/element/html
+import ubs_website/data/language.{type Language, English, Swedish}
+import ubs_website/data/settings.{type Settings}
+import ubs_website/data/site.{type Site}
+import ubs_website/route.{type Route}
+
+// TYPES -----------------------------------------------------------------------
+
+pub type Meta {
+  Meta(
+    title: String,
+    description: String,
+    route: Route,
+    /// An image for link previews, as a path from the site root. Pages without
+    /// one use the logo.
+    image: Option(String),
+  )
+}
+
+// CONSTANTS -------------------------------------------------------------------
+
+const site_name = "Uppsala Blåsarsymfoniker"
+
+const navigation = [
+  route.Concerts,
+  route.News,
+  route.About,
+  route.Join,
+  route.Booking,
+  route.Contact,
+]
+
+// VIEW ------------------------------------------------------------------------
+
+/// A complete HTML page: head metadata, header, the given body, and footer.
+///
+pub fn view(
+  site: Site,
+  settings: Settings,
+  language: Language,
+  meta: Meta,
+  body: List(Element(a)),
+) -> Element(a) {
+  html.html([attribute.lang(language.code(language))], [
+    head(site, language, meta),
+    html.body([attribute.class("flex min-h-screen flex-col")], [
+      skip_link(language),
+      header(site, language, meta.route),
+      html.main(
+        [
+          attribute.id("main"),
+          attribute.class("mx-auto w-full max-w-5xl flex-1 px-4 py-12"),
+        ],
+        body,
+      ),
+      footer(site, settings, language),
+    ]),
+  ])
+}
+
+/// Markdown rendered to HTML, styled by the `prose` utility.
+///
+pub fn prose(html: String) -> Element(a) {
+  element.unsafe_raw_html("", "div", [attribute.class("prose")], html)
+}
+
+/// The page title shown in the browser tab and in link previews.
+///
+pub fn full_title(meta: Meta) -> String {
+  case meta.route {
+    route.Home -> site_name
+    route.About
+    | route.Join
+    | route.Booking
+    | route.Contact
+    | route.Concerts
+    | route.Concert(_)
+    | route.News
+    | route.NewsItem(_) -> meta.title <> " – " <> site_name
+  }
+}
+
+// HEAD ------------------------------------------------------------------------
+
+fn head(site: Site, language: Language, meta: Meta) -> Element(a) {
+  let title = full_title(meta)
+  let image = case meta.image {
+    Some(image) -> site.url <> image
+    None -> site.url <> "/images/ubs-logo.png"
+  }
+
+  html.head([], [
+    html.meta([attribute.charset("utf-8")]),
+    html.meta([
+      attribute.name("viewport"),
+      attribute.content("width=device-width, initial-scale=1"),
+    ]),
+    html.title([], title),
+    html.meta([
+      attribute.name("description"),
+      attribute.content(meta.description),
+    ]),
+    html.link([
+      attribute.rel("canonical"),
+      attribute.href(route.url(site, meta.route, language)),
+    ]),
+    element.fragment(
+      list.map(language.all, fn(other) {
+        html.link([
+          attribute.rel("alternate"),
+          attribute.attribute("hreflang", language.code(other)),
+          attribute.href(route.url(site, meta.route, other)),
+        ])
+      }),
+    ),
+
+    // OPEN GRAPH --------------------------------------------------------------
+    property("og:site_name", site_name),
+    property("og:title", title),
+    property("og:description", meta.description),
+    property("og:url", route.url(site, meta.route, language)),
+    property("og:image", image),
+    property("og:type", "website"),
+    property(
+      "og:locale",
+      language.pick(language, swedish: "sv_SE", english: "en_GB"),
+    ),
+
+    // ICONS & STYLES ----------------------------------------------------------
+    html.link([
+      attribute.rel("icon"),
+      attribute.type_("image/svg+xml"),
+      attribute.href(route.asset(site, "/images/ubs-logo.svg")),
+    ]),
+    html.link([
+      attribute.rel("stylesheet"),
+      attribute.href(route.asset(site, "/css/site.css")),
+    ]),
+
+    analytics(site.analytics_token),
+  ])
+}
+
+fn property(name: String, content: String) -> Element(a) {
+  html.meta([attribute.attribute("property", name), attribute.content(content)])
+}
+
+/// Cloudflare Web Analytics: cookie-free, so no consent banner is needed.
+///
+fn analytics(token: Option(String)) -> Element(a) {
+  case token {
+    None -> element.none()
+    Some(token) ->
+      html.script(
+        [
+          attribute.attribute("defer", ""),
+          attribute.src("https://static.cloudflareinsights.com/beacon.min.js"),
+          attribute.attribute(
+            "data-cf-beacon",
+            "{\"token\": \"" <> token <> "\"}",
+          ),
+        ],
+        "",
+      )
+  }
+}
+
+// HEADER ----------------------------------------------------------------------
+
+fn skip_link(language: Language) -> Element(a) {
+  html.a(
+    [
+      attribute.href("#main"),
+      attribute.class(
+        "sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:rounded-sm focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-content",
+      ),
+    ],
+    [
+      html.text(language.pick(
+        language,
+        swedish: "Hoppa till innehållet",
+        english: "Skip to content",
+      )),
+    ],
+  )
+}
+
+fn header(site: Site, language: Language, current: Route) -> Element(a) {
+  html.header([attribute.class("border-b border-base-300")], [
+    html.div(
+      [
+        attribute.class(
+          "mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4",
+        ),
+      ],
+      [
+        html.a(
+          [
+            attribute.href(route.href(site, route.Home, language)),
+            attribute.class("flex items-center gap-3"),
+          ],
+          [
+            html.img([
+              attribute.src(route.asset(site, "/images/ubs-logo.svg")),
+              attribute.alt(""),
+              attribute.class("h-12 w-auto"),
+            ]),
+            html.span([attribute.class("font-display text-h3 font-bold")], [
+              html.text(site_name),
+            ]),
+          ],
+        ),
+        html.nav(
+          [
+            attribute.attribute(
+              "aria-label",
+              language.pick(
+                language,
+                swedish: "Huvudmeny",
+                english: "Main menu",
+              ),
+            ),
+          ],
+          [
+            html.ul(
+              [attribute.class("flex flex-wrap items-center gap-x-6 gap-y-2")],
+              list.append(
+                list.map(navigation, fn(target) {
+                  html.li([], [nav_link(site, language, current, target)])
+                }),
+                [html.li([], [language_switch(site, language, current)])],
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ])
+}
+
+fn nav_link(
+  site: Site,
+  language: Language,
+  current: Route,
+  target: Route,
+) -> Element(a) {
+  let is_current = section(current) == section(target)
+
+  html.a(
+    [
+      attribute.href(route.href(site, target, language)),
+      attribute.class("hover:text-primary"),
+      case is_current {
+        True -> attribute.attribute("aria-current", "page")
+        False -> attribute.none()
+      },
+      attribute.classes([#("text-primary font-semibold", is_current)]),
+    ],
+    [html.text(nav_label(target, language))],
+  )
+}
+
+/// Concert and news pages highlight their section in the navigation.
+///
+fn section(route: Route) -> Route {
+  case route {
+    route.Concert(_) -> route.Concerts
+    route.NewsItem(_) -> route.News
+    route.Home
+    | route.About
+    | route.Join
+    | route.Booking
+    | route.Contact
+    | route.Concerts
+    | route.News -> route
+  }
+}
+
+fn nav_label(target: Route, language: Language) -> String {
+  case target {
+    route.Home -> language.pick(language, swedish: "Hem", english: "Home")
+    route.Concerts | route.Concert(_) ->
+      language.pick(language, swedish: "Konserter", english: "Concerts")
+    route.News | route.NewsItem(_) ->
+      language.pick(language, swedish: "Nyheter", english: "News")
+    route.About -> language.pick(language, swedish: "Om oss", english: "About")
+    route.Join ->
+      language.pick(language, swedish: "Bli medlem", english: "Join")
+    route.Booking ->
+      language.pick(language, swedish: "Boka oss", english: "Book us")
+    route.Contact ->
+      language.pick(language, swedish: "Kontakt", english: "Contact")
+  }
+}
+
+fn language_switch(
+  site: Site,
+  language: Language,
+  current: Route,
+) -> Element(a) {
+  let #(other, label) = case language {
+    Swedish -> #(English, "English")
+    English -> #(Swedish, "Svenska")
+  }
+
+  html.a(
+    [
+      attribute.href(route.href(site, current, other)),
+      attribute.lang(language.code(other)),
+      attribute.attribute("hreflang", language.code(other)),
+      attribute.class(
+        "rounded-sm border border-base-300 px-3 py-1 text-small hover:border-primary hover:text-primary",
+      ),
+    ],
+    [html.text(label)],
+  )
+}
+
+// FOOTER ----------------------------------------------------------------------
+
+fn footer(site: Site, settings: Settings, language: Language) -> Element(a) {
+  html.footer([attribute.class("bg-neutral text-neutral-content")], [
+    html.div(
+      [
+        attribute.class(
+          "mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12 md:flex-row md:justify-between",
+        ),
+      ],
+      [
+        html.div([attribute.class("flex items-center gap-3")], [
+          html.img([
+            attribute.src(route.asset(site, "/images/ubs-logo-white.svg")),
+            attribute.alt(""),
+            attribute.class("h-10 w-auto"),
+          ]),
+          html.span([attribute.class("font-display text-h3")], [
+            html.text(site_name),
+          ]),
+        ]),
+        html.div([attribute.class("flex flex-col gap-2")], [
+          html.h2([attribute.class("label-type text-muted-inverse")], [
+            html.text(language.pick(
+              language,
+              swedish: "Kontakt",
+              english: "Contact",
+            )),
+          ]),
+          html.a(
+            [
+              attribute.href("mailto:" <> settings.email),
+              attribute.class("hover:underline"),
+            ],
+            [html.text(settings.email)],
+          ),
+          social_link(settings.facebook, "Facebook"),
+          social_link(settings.instagram, "Instagram"),
+        ]),
+      ],
+    ),
+  ])
+}
+
+fn social_link(url: Option(String), label: String) -> Element(a) {
+  case url {
+    Some(url) ->
+      html.a([attribute.href(url), attribute.class("hover:underline")], [
+        html.text(label),
+      ])
+    None -> element.none()
+  }
+}
