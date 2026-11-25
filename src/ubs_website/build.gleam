@@ -11,6 +11,7 @@ import ubs_website/data/site.{type Site}
 import ubs_website/error.{type Error}
 import ubs_website/route.{type Route}
 import ubs_website/tailwind
+import ubs_website/view/concert as concert_view
 import ubs_website/view/document
 import ubs_website/view/page
 
@@ -57,19 +58,12 @@ fn pages(
   use language <- list.flat_map(language.all)
   let pages = content.pages
   let settings = content.settings
+  let render = fn(meta: document.Meta, body) {
+    #(meta.route, language, document.view(site, settings, language, meta, body))
+  }
   let general = fn(route, text, after) {
     let text = language.get(text, language)
-    #(
-      route,
-      language,
-      document.view(
-        site,
-        settings,
-        language,
-        page.meta(text, route),
-        page.view(text, after),
-      ),
-    )
+    render(page.meta(text, route), page.view(text, after))
   }
 
   [
@@ -82,5 +76,15 @@ fn pages(
     general(route.Contact, pages.contact, [
       page.contact_details(settings, language),
     ]),
+    render(
+      concert_view.list_meta(language),
+      concert_view.list_view(site, language, content.concerts),
+    ),
+    ..list.map(content.concerts, fn(concert) {
+      render(
+        concert_view.detail_meta(language, concert),
+        concert_view.detail_view(site, language, concert),
+      )
+    })
   ]
 }

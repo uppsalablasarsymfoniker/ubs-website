@@ -61,6 +61,7 @@
   --color-base-200: #F0EEEB;
   --color-base-300: #E0DDD8; /* borders only, not a text surface */
   --color-base-content: #1A1A1A;
+  --color-card: #FFFFFF; /* elevated cards and panels on base-100 */
 
   /* No single gray clears AA on both light and dark, so muted text picks a
      tier by background. */
