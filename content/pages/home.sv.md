@@ -1,5 +1,5 @@
 +++
-title = "Uppsala Blåsarsymfoniker Förslag"
+title = "Uppsala Blåsarsymfoniker"
 summary = "En av Sveriges främsta amatörblåsorkestrar. Konserter i Uppsala sedan år 2000."
 +++
 
