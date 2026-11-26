@@ -328,28 +328,33 @@ fn header(
     html.div(
       [
         attribute.class(
-          "mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4",
+          "mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4",
         ),
       ],
       [
         html.a(
           [
             attribute.href(route.href(site, route.Home, language)),
-            attribute.class("flex items-center gap-3"),
+            // Grows from nothing, so on narrow screens the name breaks onto two
+            // lines instead of pushing the language switch onto a row alone.
+            attribute.class("flex flex-1 items-center gap-3"),
           ],
           [
             html.img([
               attribute.src(route.asset(site, "/images/ubs-logo.svg")),
               attribute.alt(""),
-              attribute.class("h-12 w-auto"),
+              attribute.class("h-10 w-auto md:h-12"),
             ]),
             html.span([attribute.class("font-display text-h3 font-bold")], [
               html.text(site_name),
             ]),
           ],
         ),
+        // On narrow screens the menu wraps onto its own rows below the logo
+        // and the language switch; on wide screens all three share a row.
         html.nav(
           [
+            attribute.class("order-last w-full lg:order-none lg:w-auto"),
             attribute.attribute(
               "aria-label",
               language.pick(
@@ -361,16 +366,18 @@ fn header(
           ],
           [
             html.ul(
-              [attribute.class("flex flex-wrap items-center gap-x-6 gap-y-2")],
-              list.append(
-                list.map(navigation, fn(target) {
-                  html.li([], [nav_link(site, language, current, target)])
-                }),
-                [html.li([], [language_switch(site, language, current)])],
-              ),
+              [
+                attribute.class(
+                  "flex flex-wrap items-center gap-x-4 gap-y-1 lg:gap-x-6",
+                ),
+              ],
+              list.map(navigation, fn(target) {
+                html.li([], [nav_link(site, language, current, target)])
+              }),
             ),
           ],
         ),
+        language_switch(site, language, current),
       ],
     ),
   ])
