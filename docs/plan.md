@@ -302,6 +302,28 @@ writes `sitemap.xml` with both languages. Dates are formatted per language
 Accessibility target: WCAG 2.1 AA — the profile's contrast rules, semantic
 headings, visible focus, `lang` on every page and on Swedish fallbacks.
 
+### Social media icons
+
+**Proposed.** Facebook and Instagram links get their platform's icon, in the
+footer and on the contact page.
+
+- **Source:** the [Simple Icons](https://simpleicons.org/) paths (CC0),
+  inlined as `<svg>` in the Gleam view. No icon font, script, or request to
+  another site.
+- **Colour:** one colour, `fill="currentColor"`, so an icon takes the colour
+  of its link: light in the footer, `text-base-content` on the contact page.
+  Meta's brand rules allow the logos in a single colour, unaltered; never
+  recolour them in brand blue or the Instagram gradient.
+- **Footer:** icons only, 24px (`size-6`) inside a 40px tap area. Each link
+  gets an `aria-label` with the platform name, and the SVG is
+  `aria-hidden="true"`.
+- **Contact page:** icon beside the account name, taken from the URL's path
+  (`instagram.com/ubsymfoniker/` → "@ubsymfoniker"). Raw URLs are not shown.
+- **Profile first:** add the icon size and colour rule to
+  `docs/ubs-profile.html`, then to the `ubs-brand` skill, before the code.
+- Adding a platform later means adding its field in `settings`, its CMS
+  field, and its icon in the same change.
+
 ## Members
 
 The member list is public personal data, so:
