@@ -3,11 +3,10 @@
 Public website for Uppsala Blåsarsymfoniker (UBS), replacing the current
 WordPress/Divi site at uppsalablasarsymfoniker.se (`ubs.nu` redirects there).
 
-Status (2026-11-26): milestone 1 (core pages) is done, reviewed, and deployed
-to the preview at https://uppsalablasarsymfoniker.github.io/ubs-website/.
-Next: milestone 2, the CMS — blocked on UBS's Cloudflare account for sign-in.
-See *Implementation status* for what exists, and `docs/handover.md` for how to
-pick up the work. Decisions marked **Proposed** are not yet agreed.
+This file describes what the site is and is meant to be, and is edited in
+place as that changes. Why each choice was made is in `docs/decisions/`;
+progress and open work are GitHub issues, grouped by milestone. Preview:
+https://uppsalablasarsymfoniker.github.io/ubs-website/
 
 Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 
@@ -66,13 +65,10 @@ required.
 
 ### Alternatives considered
 
-| Option | Why not |
-|---|---|
-| Hosted headless CMS (Sanity, Storyblok, Contentful) | Vendor account, API keys, and a runtime or build-time API dependency. Agent access goes through an MCP server rather than plain files. |
-| Self-hosted CMS (Payload, Strapi, Directus) | Needs a server and a database to host, back up, and patch. |
-| Decap CMS | Same model as Sveltia and config-compatible; Sveltia is the faster, maintained successor. Kept as fallback. |
-| Gleam server (Wisp/Mist) | Only needed for request-time features. None are required. |
-| `lustre_ssg` | The site has a dozen routes in two languages; a build module that renders Lustre elements and writes files is shorter than adapting a framework to the language rules below. Hayleigh's own site, the newest reference, does the same. |
+Hosted and self-hosted CMSs, Decap CMS, a Gleam server, and `lustre_ssg`:
+see decisions [0001](decisions/0001-static-site-built-with-gleam.md),
+[0002](decisions/0002-sveltia-cms.md), and
+[0004](decisions/0004-hand-written-build-module.md).
 
 ### Technology
 
@@ -80,25 +76,19 @@ required.
 |---|---|
 | Generator | Gleam, a hand-written build module; Lustre elements rendered to HTML strings. Structure follows Hayleigh Thompson's `hayleigh.dev` (see *Repository layout*) |
 | Markdown | `mork` — passes the full CommonMark spec test suite |
-| Front matter | TOML (`+++` delimited), parsed with `tom`. Sveltia writes it with `format: toml-frontmatter` |
+| Front matter | TOML (`+++` delimited), parsed with `tom`. Sveltia writes it with `format: toml-frontmatter`. Markdown rather than Djot: [0003](decisions/0003-markdown-with-toml-front-matter.md) |
 | Dates | `gleam_time`. Sveltia writes native TOML date-times (`2027-01-30T19:00:00.000`) and dates (`2027-01-30`) |
-| CSS | Tailwind, run from the build through `glailglind` (downloads the pinned standalone binary; no Node, no separate step). Profile tokens in `@theme` under the same names as Orkestra's DaisyUI theme. No DaisyUI: a public site needs few components, and the full DaisyUI stylesheet can't be purged without Node |
+| CSS | Tailwind, run from the build through `glailglind`; profile tokens in `@theme`; no DaisyUI ([0005](decisions/0005-tailwind-without-daisyui.md)) |
 | Fonts | Self-hosted woff2 (as in Orkestra) — no request to Google at runtime |
 | CMS | Sveltia CMS, loaded from unpkg unversioned, as its docs recommend |
-| Hosting | GitHub Pages via GitHub Actions now; Cloudflare at launch (see *Hosting*). Rebuilt on push and daily, so a concert moves to "past" without an edit |
-| Images | Sveltia converts uploads to WebP in the browser (max 2000px, quality 85) and strips EXIF. No build-time image processing |
-| Video | YouTube embeds via `youtube-nocookie.com`. **Proposed** |
-
-### Why Markdown and not Djot
-
-Djot is cleaner to parse, and Gleam has a good Djot parser (`jot`). But
-Sveltia's rich-text editor reads and writes Markdown only; storing Djot would
-mean giving editors a plain text box with no formatting toolbar. `mork` closes
-the gap on the Gleam side, so Markdown costs nothing there.
+| Hosting | GitHub Pages via GitHub Actions now; Cloudflare at launch ([0008](decisions/0008-github-pages-then-cloudflare.md)). Rebuilt on push and daily, so a concert moves to "past" without an edit |
+| Images | Sveltia converts uploads to WebP in the browser; images are shown whole ([0010](decisions/0010-images-shown-whole.md)) |
+| Video | YouTube embeds via `youtube-nocookie.com` (proposed: [0014](decisions/0014-video-embeds.md)) |
 
 ## Languages
 
-Swedish is the default and lives at the site root; English lives under `/en/`.
+Swedish is the default and lives at the site root; English lives under `/en/`
+([0006](decisions/0006-swedish-first-languages.md)).
 
 | Content | Swedish | English |
 |---|---|---|
@@ -256,8 +246,9 @@ Two ways to get the token, both documented by Sveltia:
    by whoever owns UBS's Cloudflare account, and named as `base_url` in the
    CMS config.
 
-**Decided:** "Sign in with GitHub". Personal tokens remain as a fallback
-for developers while the Worker isn't deployed yet.
+**Decided:** "Sign in with GitHub"
+([0007](decisions/0007-sign-in-with-github.md)). Personal tokens remain as a
+fallback for developers while the Worker isn't deployed yet.
 
 Setup, once UBS has a Cloudflare account:
 
@@ -291,7 +282,7 @@ Footer: contact details and social links from `settings`.
 | 404 | Both languages on one page, with links home |
 
 There are no recent photos of the orchestra, so the design must not depend on
-one: a typographic home page. Link previews use the concert's or news item's
+one: a typographic home page ([0011](decisions/0011-typographic-design.md)). Link previews use the concert's or news item's
 image, otherwise the logo PNG; a designed Open Graph image with the logo and
 name is a later follow-up. A photo can be added later without a redesign.
 
@@ -304,29 +295,13 @@ headings, visible focus, `lang` on every page and on Swedish fallbacks.
 
 ### Social media icons
 
-**Proposed.** Facebook and Instagram links get their platform's icon, in the
-footer and on the contact page.
-
-- **Source:** the [Simple Icons](https://simpleicons.org/) paths (CC0),
-  inlined as `<svg>` in the Gleam view. No icon font, script, or request to
-  another site.
-- **Colour:** one colour, `fill="currentColor"`, so an icon takes the colour
-  of its link: light in the footer, `text-base-content` on the contact page.
-  Meta's brand rules allow the logos in a single colour, unaltered; never
-  recolour them in brand blue or the Instagram gradient.
-- **Footer:** icons only, 24px (`size-6`) inside a 40px tap area. Each link
-  gets an `aria-label` with the platform name, and the SVG is
-  `aria-hidden="true"`.
-- **Contact page:** icon beside the account name, taken from the URL's path
-  (`instagram.com/ubsymfoniker/` → "@ubsymfoniker"). Raw URLs are not shown.
-- **Profile first:** add the icon size and colour rule to
-  `docs/ubs-profile.html`, then to the `ubs-brand` skill, before the code.
-- Adding a platform later means adding its field in `settings`, its CMS
-  field, and its icon in the same change.
+Proposed: Facebook and Instagram get their icons in the footer and on the
+contact page ([0015](decisions/0015-social-media-icons.md)).
 
 ## Members
 
-The member list is public personal data, so:
+The member list is public personal data, so
+([0012](decisions/0012-member-list-by-consent.md)):
 
 - Publish name, section, and role only, with each member's consent.
   Photos and Q&A profiles are opt-in per member, and come later.
@@ -344,7 +319,7 @@ Static hosting has no server to receive a form post. Options, simplest first:
 3. A form service (e.g. Formspree) or a small serverless function, if a styled
    on-site form is needed.
 
-**Proposed:** 1 and 2.
+**Proposed:** 1 and 2 ([0013](decisions/0013-forms-without-a-server.md)).
 
 ## Build, test, deploy
 
@@ -358,33 +333,11 @@ Static hosting has no server to receive a form post. Options, simplest first:
   `actions/deploy-pages`.
 - Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` (GitHub Pages)
   until the domain moves.
-- The deploy step occasionally fails with "No artifacts named github-pages
-  were found" although the upload succeeded — a GitHub-side flake seen twice
-  in the first runs. Re-run the workflow (`gh run rerun <id>`).
 
-### Hosting: GitHub Pages or Cloudflare
+### Hosting
 
-Both serve the same `dist/` folder, both are free at this size, and both
-build in GitHub Actions, so the choice can be changed later.
-
-| | GitHub Pages | Cloudflare (Pages, or Workers static assets) |
-|---|---|---|
-| Accounts | None beyond GitHub | A Cloudflare account — needed anyway for CMS "Sign in with GitHub" |
-| Deploy | `actions/deploy-pages`, no secrets | `wrangler` from Actions, with an API token secret |
-| Repository | Must be public on the free plan | Public or private |
-| Old WordPress URLs | No server redirects: one HTML page per old URL with a meta refresh | Real 301 redirects from a `_redirects` file |
-| Headers | Fixed by GitHub | Custom headers (`_headers`), e.g. a Content Security Policy |
-| Preview deploys | None; only `main` is published | A preview URL for every branch and pull request |
-| Limits | 1 GB site, ~100 GB bandwidth per month (soft) | Unlimited bandwidth on static requests |
-| Custom domain | A/CNAME records at One.com; free HTTPS | `www` via CNAME; the bare domain needs the DNS moved to Cloudflare; free HTTPS |
-| Analytics | Bring your own | Cloudflare Web Analytics built in |
-
-Cloudflare now steers new projects to Workers static assets rather than
-Pages; for a static folder the two behave the same.
-
-**Decided:** GitHub Pages while building, since it needs nothing new.
-Cloudflare at launch — UBS needs a Cloudflare account for the CMS sign-in
-Worker either way, and the old WordPress URLs need real redirects.
+GitHub Pages while building; Cloudflare at launch, for real redirects of the
+old WordPress URLs ([0008](decisions/0008-github-pages-then-cloudflare.md)).
 
 ## Analytics
 
@@ -400,18 +353,10 @@ What it answers: which pages are read, how many visits a concert page gets,
 where visitors come from (Facebook, Google, a newspaper link). What it can't:
 follow one person across visits, or count unique visitors exactly.
 
-| Option | Cost | Notes |
-|---|---|---|
-| Cloudflare Web Analytics | Free | A script on any host, or automatic on Cloudflare hosting. Data held by Cloudflare (US company) |
-| GoatCounter | Free for non-commercial use | Open source, small, run by one developer in the EU |
-| Plausible | Paid (from roughly €9/month) | Open source, EU-hosted, polished dashboards; can be self-hosted |
-
-**Decided:** Cloudflare Web Analytics. It works on GitHub Pages too, via
-its script tag. The build reads the site token from the
-`CLOUDFLARE_ANALYTICS_TOKEN` environment variable (a GitHub Actions
-variable) and adds the script only when it is set, so local builds and
-forks send nothing. Once hosting moves to Cloudflare, analytics can be
-switched on in the dashboard instead and the variable removed.
+Cloudflare Web Analytics ([0009](decisions/0009-cloudflare-web-analytics.md)).
+The build reads the site token from the `CLOUDFLARE_ANALYTICS_TOKEN`
+environment variable (a GitHub Actions variable) and adds the script only
+when it is set.
 
 ## What the current site has
 
@@ -488,63 +433,17 @@ Then:
 color, typography, logo, and spacing. The `ubs-brand` and `tailwind` skills in
 `.claude/skills/` apply it to this repository.
 
-The profile is written for an app UI. A public site will likely need more:
-image treatment, hero layouts, a larger display size for the home page.
-Extend the profile first, then the code.
-
-## Implementation status
-
-**Milestone 1 — done.**
-
-- `gleam run build` renders 17 routes in both languages (34 pages), a
-  bilingual 404, `sitemap.xml`, and `robots.txt` into `dist/`, copies
-  `assets/`, and compiles the CSS through the pinned Tailwind.
-- Content from *Core content* is migrated: five general pages in both
-  languages, eight concerts from 2025 onward with WebP/AVIF images, two news
-  items, contact settings, and an empty member list.
-- Content errors fail the build with the file named: missing or invalid
-  fields, invalid front matter or TOML, a general page without English, an
-  English file without a Swedish one, and misnamed files in a collection.
-- A concert always has at least one performance — enforced by the
-  `Performances(first, rest)` type, checked once in `concert.load`.
-- 29 tests: content parsing and errors, the real `content/` folder loading,
-  routes and base path, the Swedish fallback and its `lang` marking, date
-  formatting, concert status and order, member sections, and the sitemap.
-- Reviewed with the `gleam-reviewer` agent against the official Gleam
-  conventions; all findings fixed.
-- GitHub Actions deploys on push, daily at 02:00 UTC, and on demand.
-
-**Waiting on the board:** review of the new join and booking text and of all
-English translations; confirmation of the phone number and postal address;
-the conductor-search news is dated 2026-11-01 (when it appeared on the home
-page — the real date is unknown); members' consent for the member list.
-
-**Not started:** milestone 2 (CMS: `assets/admin/` does not exist yet),
-analytics token (set the `CLOUDFLARE_ANALYTICS_TOKEN` repository variable),
-milestones 3–5.
-
-## Open questions
-
-- Who owns UBS's Cloudflare account? It blocks CMS sign-in, analytics,
-  and the move to Cloudflare hosting.
-
-## Later follow-ups
-
-- Newsletter sign-up.
-- Calendar feed (iCal) of upcoming concerts.
-- Orchestra photos for the home page and Open Graph image.
-- `gleam run serve`: a local server with live reload while editing.
+The profile is written for an app UI, and a public site needs more of it
+(the home page's Display size, for one). Extend the profile first, then the
+code.
 
 ## Milestones
 
-1. **Core pages** — **done.** One small commit per step:
-   1. Gleam project (`gleam new`, `gleam add`), CLAUDE.md commands.
-   2. Content loading: front matter, Markdown, both languages, errors.
-   3. Layout, CSS tokens, fonts, logos.
-   4. General pages, then concerts, then news, then the member list.
-   5. 404, sitemap, meta tags.
-   6. GitHub Actions deploy to the preview URL.
-   Content from *Core content*, migrated in its own commits.
+Progress on each is tracked in the GitHub milestone of the same name.
+
+1. **Core pages** — the Gleam build, content loading, the general pages,
+   concerts, news, members, 404, sitemap, and the deploy to the preview URL,
+   with the content from *Core content*.
 2. **CMS** — Sveltia at `/admin` with the five collections; "Sign in with
    GitHub" via the Worker; Cloudflare Web Analytics token.
 3. **Migration** — inventory, select, and migrate content; members give
