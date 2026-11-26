@@ -208,9 +208,11 @@ i18n:
   `content/pages/about.{{locale}}.md`. Fields `i18n: true`, which makes every
   locale required.
 - **concerts**, **news** — folder collections, `format: toml-frontmatter`.
-  Translatable fields `i18n: true` with `required: [sv]`, so English may be
-  left out. Language-neutral fields `i18n: duplicate` (edited in Swedish,
-  read-only in English).
+  New entries start in Swedish only (`initial_locales: default`); an editor
+  switches English on to translate, and an English that is on must have its
+  title, summary, and text. Language-neutral fields are `i18n: false`, stored
+  in the Swedish file only, where the site reads them. File names: news
+  `<date>-<title>`, concerts `<first performance date>-<title>`, in ASCII.
 - **members**, **settings** — file collections with `format: toml`, no i18n.
   Members is a list widget of objects, stored as `[[members]]` tables.
 - **Media** — `media_folder: assets/images/uploads`, `public_folder:
