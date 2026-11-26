@@ -13,6 +13,6 @@
   "workers_dev": true,
   "vars": {
     // Sites allowed to use the service: the preview hosts and the domain.
-    "ALLOWED_DOMAINS": "ubs-website.uppsalablasarsymfoniker.workers.dev, uppsalablasarsymfoniker.github.io, uppsalablasarsymfoniker.se, www.uppsalablasarsymfoniker.se"
+    "ALLOWED_DOMAINS": "website.uppsalablasarsymfoniker.workers.dev, uppsalablasarsymfoniker.github.io, uppsalablasarsymfoniker.se, www.uppsalablasarsymfoniker.se"
   }
 }

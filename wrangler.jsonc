@@ -2,7 +2,7 @@
 // docs/decisions/0016-cloudflare-hosting-now.md. Deployed by
 // .github/workflows/deploy.yml.
 {
-  "name": "ubs-website",
+  "name": "website",
   "compatibility_date": "2026-11-11",
   "account_id": "23bc02dba2498c6718bf3114563bad74",
   "workers_dev": true,

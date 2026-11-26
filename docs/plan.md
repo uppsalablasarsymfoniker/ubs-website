@@ -6,7 +6,7 @@ WordPress/Divi site at uppsalablasarsymfoniker.se (`ubs.nu` redirects there).
 This file describes what the site is and is meant to be, and is edited in
 place as that changes. Why each choice was made is in `docs/decisions/`;
 progress and open work are GitHub issues, grouped by milestone. Preview:
-https://ubs-website.uppsalablasarsymfoniker.workers.dev/
+https://website.uppsalablasarsymfoniker.workers.dev/
 
 Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 
@@ -340,7 +340,7 @@ Static hosting has no server to receive a form post. Options, simplest first:
   Erlang and Gleam (`erlef/setup-beam`), test, build, deploy `dist/` with
   `cloudflare/wrangler-action` and the `CLOUDFLARE_API_TOKEN` secret
   (`wrangler.jsonc`).
-- Preview at `ubs-website.uppsalablasarsymfoniker.workers.dev` until the
+- Preview at `website.uppsalablasarsymfoniker.workers.dev` until the
   domain moves.
 
 ### Hosting

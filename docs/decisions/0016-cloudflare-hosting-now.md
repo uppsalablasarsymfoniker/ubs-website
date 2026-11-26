@@ -11,7 +11,7 @@ headers, and the deploy all at once.
 ## Decision
 
 Host on Cloudflare from now on, at
-`ubs-website.uppsalablasarsymfoniker.workers.dev` until the domain moves.
+`website.uppsalablasarsymfoniker.workers.dev` until the domain moves.
 GitHub Actions builds the site and deploys `dist/` with wrangler as Workers
 static assets, which Cloudflare now recommends over Pages for a static folder.
 The deploy needs a `CLOUDFLARE_API_TOKEN` secret in the repository. GitHub

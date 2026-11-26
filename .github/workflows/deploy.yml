@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://ubs-website.uppsalablasarsymfoniker.workers.dev
+      url: https://website.uppsalablasarsymfoniker.workers.dev
 
     steps:
       - name: Check out the repository
@@ -43,7 +43,7 @@ jobs:
       - name: Build the site
         run: gleam run build
         env:
-          SITE_URL: https://ubs-website.uppsalablasarsymfoniker.workers.dev
+          SITE_URL: https://website.uppsalablasarsymfoniker.workers.dev
           CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_TOKEN }}
 
       - name: Deploy to Cloudflare
