@@ -259,7 +259,7 @@ How it is set up:
   client ID and `ALLOWED_DOMAINS`. `.github/workflows/cms-auth.yml` deploys it
   to `sveltia-cms-auth.uppsalablasarsymfoniker.workers.dev` when that folder
   changes.
-- The GitHub App "UBS website CMS" in the `uppsalablasarsymfoniker`
+- The GitHub App "UBS Website CMS" in the `uppsalablasarsymfoniker`
   organisation: callback `https://sveltia-cms-auth.uppsalablasarsymfoniker.workers.dev/callback`,
   repository permission Contents: read and write, installed on this
   repository only. A GitHub App rather than an OAuth App, because its tokens
