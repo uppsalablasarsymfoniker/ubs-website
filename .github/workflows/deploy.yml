@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
@@ -11,11 +11,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: deploy
   cancel-in-progress: false
 
 jobs:
@@ -23,8 +21,8 @@ jobs:
     name: Build and deploy
     runs-on: ubuntu-latest
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: production
+      url: https://ubs-website.uppsalablasarsymfoniker.workers.dev
 
     steps:
       - name: Check out the repository
@@ -42,21 +40,14 @@ jobs:
       - name: Test
         run: gleam test
 
-      - name: Configure Pages
-        id: pages
-        uses: actions/configure-pages@v6
-
       - name: Build the site
         run: gleam run build
         env:
-          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          SITE_URL: https://ubs-website.uppsalablasarsymfoniker.workers.dev
           CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_ANALYTICS_TOKEN }}
 
-      - name: Upload the site
-        uses: actions/upload-pages-artifact@v5
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v4
         with:
-          path: dist
-
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v5
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy

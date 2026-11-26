@@ -98,7 +98,8 @@ pub fn full_title(meta: Meta) -> String {
   }
 }
 
-/// The page GitHub Pages serves for any missing path. It is the same file for
+/// The page the host serves for any missing path (`404.html`, see
+/// `wrangler.jsonc`). It is the same file for
 /// both languages, so it speaks both, and every link is absolute.
 ///
 pub fn not_found(site: Site, settings: Settings) -> Element(a) {
