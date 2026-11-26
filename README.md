@@ -27,8 +27,10 @@ directly, or use Sveltia CMS at `/admin` (configured in
 
 ## Docs
 
-- `docs/plan.md`: requirements and decisions
-- `docs/handover.md`: current state and how to pick up the work
+- `docs/plan.md`: what the site is and should be
+- `docs/decisions/`: why each choice was made
+- [Issues](https://github.com/uppsalablasarsymfoniker/ubs-website/issues) and
+  [milestones](https://github.com/uppsalablasarsymfoniker/ubs-website/milestones): status and open work
 - `docs/ubs-profile.html`: the graphical profile
 
 Contributors, human or agent, follow `CLAUDE.md`.
