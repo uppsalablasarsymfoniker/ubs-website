@@ -1,0 +1,18 @@
+// The sign-in service for Sveltia CMS ("Sign in with GitHub"); see
+// docs/decisions/0007-sign-in-with-github.md. index.js is
+// https://github.com/sveltia/sveltia-cms-auth at commit e62e76a, unchanged;
+// to upgrade, replace it with a newer release after reading the diff.
+//
+// GITHUB_CLIENT_SECRET is a Worker secret, set in the Cloudflare dashboard,
+// never here.
+{
+  "name": "sveltia-cms-auth",
+  "main": "index.js",
+  "compatibility_date": "2026-11-11",
+  "account_id": "23bc02dba2498c6718bf3114563bad74",
+  "workers_dev": true,
+  "vars": {
+    // Sites allowed to use the service: the preview hosts and the domain.
+    "ALLOWED_DOMAINS": "ubs-website.uppsalablasarsymfoniker.workers.dev, uppsalablasarsymfoniker.github.io, uppsalablasarsymfoniker.se, www.uppsalablasarsymfoniker.se"
+  }
+}
