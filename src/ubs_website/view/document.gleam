@@ -477,7 +477,7 @@ fn footer(site: Site, settings: Settings, heading: String) -> Element(a) {
     html.div(
       [
         attribute.class(
-          "mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12 md:flex-row md:justify-between",
+          "mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12 md:flex-row md:items-start md:justify-between",
         ),
       ],
       [

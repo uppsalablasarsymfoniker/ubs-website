@@ -20,7 +20,7 @@ pub fn list_view(
   items: List(NewsItem),
 ) -> List(Element(a)) {
   [
-    html.h1([attribute.class("mb-12 text-h1 font-bold")], [
+    html.h1([attribute.class("mb-8 text-h1 font-bold")], [
       html.text(title(language)),
     ]),
     items_view(site, language, items),
@@ -61,7 +61,7 @@ pub fn detail_view(
       ]),
       html.h1(
         [
-          attribute.class("mb-6 text-h1 font-bold"),
+          attribute.class("mb-8 text-h1 font-bold"),
           document.lang_if_different(language, text_language),
         ],
         [html.text(text.title)],

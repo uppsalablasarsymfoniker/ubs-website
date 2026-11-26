@@ -26,7 +26,7 @@ pub fn list_view(
   let past = concert.past(concerts, site.today)
 
   [
-    html.h1([attribute.class("mb-12 text-h1 font-bold")], [
+    html.h1([attribute.class("mb-8 text-h1 font-bold")], [
       html.text(title(language)),
     ]),
     html.section([attribute.class("mb-16")], [
@@ -121,7 +121,7 @@ pub fn detail_view(
       ]),
       html.h1(
         [
-          attribute.class("mb-6 text-h1 font-bold"),
+          attribute.class("mb-8 text-h1 font-bold"),
           document.lang_if_different(language, text_language),
         ],
         [html.text(text.title)],
