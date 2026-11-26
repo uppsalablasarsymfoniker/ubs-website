@@ -44,6 +44,10 @@ i18n:
   structure: multiple_files
   locales: [sv, en]
   default_locale: sv
+  # New concerts and news start in Swedish only; an editor switches English on
+  # from the editor's menu to translate. A locale that is off writes no file,
+  # and one that is on must have its title, summary, and text.
+  initial_locales: default
 
 collections:
   - name: pages
@@ -85,6 +89,7 @@ collections:
     label: Konserter
     label_singular: Konsert
     folder: content/concerts
+    slug: "{{performances.0 | date('YYYY-MM-DD')}}-{{title}}"
     media_folder: /assets/images/concerts
     public_folder: /images/concerts
     extension: md
@@ -93,28 +98,27 @@ collections:
     i18n: true
     sortable_fields: [title, performances]
     fields:
-      - { name: title, label: Titel, widget: string, i18n: true, required: [sv] }
+      - { name: title, label: Titel, widget: string, i18n: true }
       - name: summary
         label: Sammanfattning
         widget: text
         i18n: true
-        required: [sv]
       - name: performances
         label: Föreställningar
         label_singular: Föreställning
         widget: list
-        i18n: duplicate
+        i18n: false
         min: 1
         field: { name: performance, label: Datum och tid, widget: datetime }
-      - { name: venue, label: Plats, widget: string, i18n: duplicate }
+      - { name: venue, label: Plats, widget: string, i18n: false }
       - name: ticket_url
         label: Biljettlänk
         widget: string
         type: url
         required: false
-        i18n: duplicate
-      - { name: image, label: Bild, widget: image, required: false, i18n: duplicate }
-      - { name: body, label: Text, widget: markdown, i18n: true, required: [sv] }
+        i18n: false
+      - { name: image, label: Bild, widget: image, required: false, i18n: false }
+      - { name: body, label: Text, widget: markdown, i18n: true }
 
   - name: news
     label: Nyheter
@@ -129,15 +133,14 @@ collections:
     i18n: true
     sortable_fields: [title, date]
     fields:
-      - { name: title, label: Titel, widget: string, i18n: true, required: [sv] }
+      - { name: title, label: Titel, widget: string, i18n: true }
       - name: summary
         label: Sammanfattning
         widget: text
         i18n: true
-        required: [sv]
-      - { name: date, label: Datum, widget: datetime, type: date, i18n: duplicate }
-      - { name: image, label: Bild, widget: image, required: false, i18n: duplicate }
-      - { name: body, label: Text, widget: markdown, i18n: true, required: [sv] }
+      - { name: date, label: Datum, widget: datetime, type: date, i18n: false }
+      - { name: image, label: Bild, widget: image, required: false, i18n: false }
+      - { name: body, label: Text, widget: markdown, i18n: true }
 
   - name: data
     label: Inställningar
