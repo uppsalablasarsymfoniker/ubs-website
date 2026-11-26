@@ -2,6 +2,7 @@
 title = "Uppsala Blåsarsymfoniker söker ny dirigent"
 summary = "Efter 13 år lämnar Leif Karlsson över taktpinnen våren 2027. Är du vår nya dirigent?"
 date = 2026-11-01
+image = "/images/news/2026-11-01-vi-soker-ny-dirigent.webp"
 +++
 
 Efter 13 fantastiska år har vår dirigent Leif Karlsson valt att lämna över taktpinnen till våren 2027. Vi söker därför en ny dirigent och konstnärlig ledare.
