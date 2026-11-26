@@ -1,6 +1,6 @@
 # 0008. GitHub Pages now, Cloudflare at launch
 
-Status: Accepted · 2026-11-25
+Status: Superseded by [0016](0016-cloudflare-hosting-now.md) · 2026-11-26
 
 ## Context
 

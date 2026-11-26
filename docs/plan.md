@@ -6,7 +6,7 @@ WordPress/Divi site at uppsalablasarsymfoniker.se (`ubs.nu` redirects there).
 This file describes what the site is and is meant to be, and is edited in
 place as that changes. Why each choice was made is in `docs/decisions/`;
 progress and open work are GitHub issues, grouped by milestone. Preview:
-https://uppsalablasarsymfoniker.github.io/ubs-website/
+https://ubs-website.uppsalablasarsymfoniker.workers.dev/
 
 Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
 
@@ -36,7 +36,7 @@ through a git-based CMS.
           GitHub Actions: gleam run build → dist/ (HTML, CSS, assets)
                         │
                         ▼
-                 GitHub Pages
+          Cloudflare Workers static assets
 ```
 
 ### Does a static site work with a CMS web UI?
@@ -81,7 +81,7 @@ see decisions [0001](decisions/0001-static-site-built-with-gleam.md),
 | CSS | Tailwind, run from the build through `glailglind`; profile tokens in `@theme`; no DaisyUI ([0005](decisions/0005-tailwind-without-daisyui.md)) |
 | Fonts | Self-hosted woff2 (as in Orkestra) — no request to Google at runtime |
 | CMS | Sveltia CMS, loaded from unpkg unversioned, as its docs recommend |
-| Hosting | GitHub Pages via GitHub Actions now; Cloudflare at launch ([0008](decisions/0008-github-pages-then-cloudflare.md)). Rebuilt on push and daily, so a concert moves to "past" without an edit |
+| Hosting | Cloudflare Workers static assets, deployed from GitHub Actions ([0016](decisions/0016-cloudflare-hosting-now.md)). Rebuilt on push and daily, so a concert moves to "past" without an edit |
 | Images | Sveltia converts uploads to WebP in the browser; images are shown whole ([0010](decisions/0010-images-shown-whole.md)) |
 | Video | YouTube embeds via `youtube-nocookie.com` (proposed: [0014](decisions/0014-video-embeds.md)) |
 
@@ -151,6 +151,8 @@ assets/                 copied to dist/ as is
   fonts/              self-hosted woff2 + OFL licences
   images/             logos; uploads/ for CMS media
 dist/                   build output, not committed
+workers/cms-auth/       the CMS sign-in Worker (sveltia-cms-auth)
+wrangler.jsonc          the site's Cloudflare deploy
 ```
 
 The layout mirrors Hayleigh Thompson's `hayleigh.dev`
@@ -163,8 +165,8 @@ Build: `gleam run build`. A `serve` command with live reload, like
 `hayleigh.dev`'s, is a later follow-up; until then, preview `dist/` with any
 static file server.
 `SITE_URL` sets the public address, including any path the site lives under
-(e.g. `https://uppsalablasarsymfoniker.github.io/ubs-website` for the GitHub
-Pages project URL); without it the build targets `http://localhost:8000`.
+(e.g. `https://example.org/ubs-website`); without it the build targets
+`http://localhost:8000`.
 Every internal link and asset URL goes through `route.gleam`, which adds the
 path, so the site works both at a domain root and under a project path.
 `CLOUDFLARE_ANALYTICS_TOKEN` adds the analytics script when set.
@@ -248,18 +250,24 @@ Two ways to get the token, both documented by Sveltia:
 
 **Decided:** "Sign in with GitHub"
 ([0007](decisions/0007-sign-in-with-github.md)). Personal tokens remain as a
-fallback for developers while the Worker isn't deployed yet.
+fallback for developers.
 
-Setup, once UBS has a Cloudflare account:
+How it is set up:
 
-1. Deploy `sveltia-cms-auth` to Cloudflare Workers (its README has a
-   one-click deploy).
-2. Create a GitHub App (or OAuth App) in the `uppsalablasarsymfoniker`
-   organisation, with the Worker's `/callback` URL as the callback.
-3. Set the app's client ID and secret, and `ALLOWED_DOMAINS` (the site's
-   domains), as Worker secrets.
-4. Put the Worker URL in `assets/admin/config.yml` as `backend.base_url`.
-5. Create an "editors" team with Write access to this repository.
+- The Worker's code is `workers/cms-auth/index.js`, `sveltia-cms-auth` copied
+  unchanged at a pinned commit; `workers/cms-auth/wrangler.jsonc` holds the
+  client ID and `ALLOWED_DOMAINS`. `.github/workflows/cms-auth.yml` deploys it
+  to `sveltia-cms-auth.uppsalablasarsymfoniker.workers.dev` when that folder
+  changes.
+- The GitHub App "UBS website CMS" in the `uppsalablasarsymfoniker`
+  organisation: callback `https://sveltia-cms-auth.uppsalablasarsymfoniker.workers.dev/callback`,
+  repository permission Contents: read and write, installed on this
+  repository only. A GitHub App rather than an OAuth App, because its tokens
+  reach only the repositories it is installed on.
+- The app's client secret is the Worker secret `GITHUB_CLIENT_SECRET`, set in
+  the Cloudflare dashboard.
+- `assets/admin/config.yml` names the Worker as `backend.base_url`.
+- Editors are in an "editors" team with Write access to this repository.
 
 ## Pages
 
@@ -329,15 +337,16 @@ Static hosting has no server to receive a form post. Options, simplest first:
 - `gleam test` covers content parsing, the language fallback rules, routing,
   and date formatting.
 - GitHub Actions on push to `main`, daily at 02:00 UTC, and on demand: set up
-  Erlang and Gleam (`erlef/setup-beam`), test, build, deploy with
-  `actions/deploy-pages`.
-- Preview at `uppsalablasarsymfoniker.github.io/ubs-website/` (GitHub Pages)
-  until the domain moves.
+  Erlang and Gleam (`erlef/setup-beam`), test, build, deploy `dist/` with
+  `cloudflare/wrangler-action` and the `CLOUDFLARE_API_TOKEN` secret
+  (`wrangler.jsonc`).
+- Preview at `ubs-website.uppsalablasarsymfoniker.workers.dev` until the
+  domain moves.
 
 ### Hosting
 
-GitHub Pages while building; Cloudflare at launch, for real redirects of the
-old WordPress URLs ([0008](decisions/0008-github-pages-then-cloudflare.md)).
+Cloudflare Workers static assets ([0016](decisions/0016-cloudflare-hosting-now.md)),
+which allow real redirects of the old WordPress URLs and custom headers.
 
 ## Analytics
 
