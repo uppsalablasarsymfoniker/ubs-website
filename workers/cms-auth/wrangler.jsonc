@@ -15,7 +15,7 @@
     // The GitHub App "UBS Website CMS" in the uppsalablasarsymfoniker
     // organisation. Not a secret: GitHub shows it to every user who signs in.
     "GITHUB_CLIENT_ID": "Iv23liGtMPhv8xifkjor",
-    // Sites allowed to use the service: the preview hosts and the domain.
-    "ALLOWED_DOMAINS": "website.uppsalablasarsymfoniker.workers.dev, uppsalablasarsymfoniker.github.io, uppsalablasarsymfoniker.se, www.uppsalablasarsymfoniker.se"
+    // Sites allowed to use the service: the preview host and the domain.
+    "ALLOWED_DOMAINS": "website.uppsalablasarsymfoniker.workers.dev, uppsalablasarsymfoniker.se, www.uppsalablasarsymfoniker.se"
   }
 }
