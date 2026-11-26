@@ -106,7 +106,8 @@ edit `gleam.toml` or `manifest.toml` by hand to do something a command does.
 - `.claude/agents/gleam-reviewer.md`: run it before committing Gleam work.
   If the session didn't start in this folder, the agent type isn't
   registered: run a general-purpose agent and tell it to follow that file.
-- `.claude/hooks/gleam-format.sh` formats `.gleam` files after each edit.
+- `.claude/hooks/gleam-format.sh` runs `gleam format` before each `git commit`
+  and stops the commit if the code doesn't parse.
 - `.mcp.json` provides the `gleam_packages` server for Hex package docs.
 - Skills in `.claude/skills/`: `ubs-brand`, `tailwind`, `decision-record`.
 
