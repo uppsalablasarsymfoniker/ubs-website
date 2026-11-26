@@ -6,7 +6,7 @@
 /* Always emit the brand utilities, even before anything uses one: a first use
    would otherwise fall back silently to the inherited value until the next
    build, and on a dark surface that fallback is invisible. */
-@source inline("text-{h1,h2,h3,body,small,label}");
+@source inline("text-{display,h1,h2,h3,body,small,label}");
 @source inline("{text,bg,border}-{muted,muted-inverse}");
 @source inline("font-{display,body,mono}");
 @source inline("label-type");
@@ -28,6 +28,9 @@
 
   /* ── Type scale (profile §04). Line-height and tracking travel with the
      size, so `text-h2` carries the full spec. ── */
+  --text-display: 56px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: 0;
   --text-h1: 36px;
   --text-h1--line-height: 1.15;
   --text-h1--letter-spacing: 0.5px;

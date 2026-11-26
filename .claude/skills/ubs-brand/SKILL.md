@@ -70,10 +70,11 @@ When introducing a pair not listed here, check it against the matrix in profile 
 
 ## Typography
 
-Six steps. Size, line-height, and letter-spacing travel together in one utility — never add `leading-*` or `tracking-*` on top.
+Seven steps. Size, line-height, and letter-spacing travel together in one utility — never add `leading-*` or `tracking-*` on top.
 
 | Utility | Size | Leading | Tracking | For |
 |---|---|---|---|---|
+| `text-display` | 56px | 1.1 | 0 | Home page title only, from `md:` up (`text-h1 md:text-display`) |
 | `text-h1` | 36px | 1.15 | 0.5px | Page title |
 | `text-h2` | 28px | 1.2 | 0 | Section heading |
 | `text-h3` | 20px | 1.3 | 0 | Subheading |

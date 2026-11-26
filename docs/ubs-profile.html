@@ -28,6 +28,7 @@
     --card: #FFFFFF;
 
     /* ── Type scale ── */
+    --text-display: 56px;
     --text-h1: 36px;
     --text-h2: 28px;
     --text-h3: 20px;
@@ -754,7 +755,7 @@
       <span class="section-number">04</span>
       <h2>Type Scale</h2>
     </div>
-    <p class="section-note">Six steps, hand-tuned rather than modular. Every size on this page comes from this scale &mdash; if a design needs a size that isn't here, extend the scale rather than adding a one-off.</p>
+    <p class="section-note">Seven steps, hand-tuned rather than modular. Every size on this page comes from this scale &mdash; if a design needs a size that isn't here, extend the scale rather than adding a one-off. Display is for the website's home page title only, on screens 768px and wider; narrower screens use H1.</p>
     <div class="card-surface" id="typeScale"></div>
   </section>
 
@@ -1097,6 +1098,7 @@
   /* ── 04 Type Scale ─── */
 
   const typeScale = [
+    { label: "Display", size: 56, family: "var(--font-display)", weight: 700, lh: 1.1, tracking: "0", text: "Uppsala Blåsarsymfoniker" },
     { label: "H1",    size: 36, family: "var(--font-display)", weight: 700, lh: 1.15, tracking: "0.5px",   text: "Konsert i Uppsala" },
     { label: "H2",    size: 28, family: "var(--font-display)", weight: 700, lh: 1.2,  tracking: "0",     text: "Program & Repertoar" },
     { label: "H3",    size: 20, family: "var(--font-display)", weight: 400, lh: 1.3,  tracking: "0",     text: "Om orkestern" },
