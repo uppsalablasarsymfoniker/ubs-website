@@ -100,11 +100,16 @@ fn pages(
   }
 
   [
-    general(
-      route.Home,
-      pages.home,
-      page.home_sections(site, language, content.concerts, content.news),
-    ),
+    {
+      let text = language.get(pages.home, language)
+      render(
+        page.meta(text, route.Home),
+        page.home_view(
+          text,
+          page.home_sections(site, language, content.concerts, content.news),
+        ),
+      )
+    },
     general(route.About, pages.about, [
       member_view.view(language, content.members),
     ]),

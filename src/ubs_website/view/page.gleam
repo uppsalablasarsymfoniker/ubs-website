@@ -2,6 +2,8 @@
 
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/string
+import gleam/uri
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
@@ -24,6 +26,23 @@ import ubs_website/view/news as news_view
 pub fn view(text: Text, after: List(Element(a))) -> List(Element(a)) {
   [
     html.h1([attribute.class("mb-8 text-h1 font-bold")], [html.text(text.title)]),
+    document.prose([], text.body),
+    ..after
+  ]
+}
+
+/// The home page: the orchestra's name set large, its introduction, and the
+/// sections after it. There is no photo, so the type carries the page.
+///
+pub fn home_view(text: Text, after: List(Element(a))) -> List(Element(a)) {
+  [
+    html.div(
+      [attribute.class("mb-6 h-1 w-12 bg-accent"), attribute.aria_hidden(True)],
+      [],
+    ),
+    html.h1([attribute.class("mb-8 text-h1 font-bold md:text-display")], [
+      html.text(text.title),
+    ]),
     document.prose([], text.body),
     ..after
   ]
@@ -64,7 +83,11 @@ pub fn email_button(settings: Settings, language: Language) -> Element(a) {
 ///
 pub fn contact_details(settings: Settings, language: Language) -> Element(a) {
   html.dl(
-    [attribute.class("mt-8 grid gap-x-8 gap-y-2 sm:grid-cols-[auto_1fr]")],
+    [
+      attribute.class(
+        "mt-8 grid items-baseline gap-x-8 gap-y-2 sm:grid-cols-[auto_1fr]",
+      ),
+    ],
     [
       detail(
         language.pick(language, swedish: "E-post", english: "Email"),
@@ -94,8 +117,8 @@ pub fn contact_details(settings: Settings, language: Language) -> Element(a) {
           ])
         }),
       ),
-      detail("Facebook", option.map(settings.facebook, external_link)),
-      detail("Instagram", option.map(settings.instagram, external_link)),
+      detail("Facebook", option.map(settings.facebook, account_link(_, ""))),
+      detail("Instagram", option.map(settings.instagram, account_link(_, "@"))),
     ],
   )
 }
@@ -111,10 +134,31 @@ fn detail(label: String, value: Option(Element(a))) -> Element(a) {
   }
 }
 
-fn external_link(url: String) -> Element(a) {
+fn account_link(url: String, prefix: String) -> Element(a) {
   html.a([attribute.href(url), attribute.class("text-primary underline")], [
-    html.text(url),
+    html.text(account_name(url, prefix)),
   ])
+}
+
+/// The account name from a profile URL: its last path segment, so
+/// `https://www.instagram.com/ubsymfoniker/` with prefix "@" is
+/// "@ubsymfoniker". Editors paste these URLs into the CMS, so any URL that
+/// doesn't look like a plain profile address (a query string, a file name
+/// like `profile.php`, no path) is shown whole rather than guessed at.
+///
+pub fn account_name(url: String, prefix: String) -> String {
+  case uri.parse(url) {
+    Ok(uri.Uri(query: None, path:, ..)) ->
+      case list.last(uri.path_segments(path)) {
+        Ok(name) ->
+          case string.contains(name, ".") {
+            True -> url
+            False -> prefix <> name
+          }
+        Error(Nil) -> url
+      }
+    Ok(uri.Uri(query: Some(_), ..)) | Error(Nil) -> url
+  }
 }
 
 // HOME ------------------------------------------------------------------------
@@ -191,6 +235,11 @@ pub fn home_sections(
           swedish: "Vi repeterar varje måndag i Uppsala. Berätta om dig själv och vad du spelar.",
           english: "We rehearse every Monday in Uppsala. Tell us about yourself and what you play.",
         ),
+        language.pick(
+          language,
+          swedish: "Så blir du medlem",
+          english: "How to join",
+        ),
       ),
       invitation(
         route.href(site, route.Booking, language),
@@ -199,6 +248,11 @@ pub fn home_sections(
           language,
           swedish: "Omkring 50 musiker till konserter, festivaler och evenemang.",
           english: "Around 50 musicians for concerts, festivals, and events.",
+        ),
+        language.pick(
+          language,
+          swedish: "Boka orkestern",
+          english: "Book the orchestra",
         ),
       ),
     ]),
@@ -217,7 +271,12 @@ fn more_link(href: String, label: String) -> Element(a) {
   ])
 }
 
-fn invitation(href: String, title: String, description: String) -> Element(a) {
+fn invitation(
+  href: String,
+  title: String,
+  description: String,
+  action: String,
+) -> Element(a) {
   html.a(
     [
       attribute.href(href),
@@ -228,15 +287,20 @@ fn invitation(href: String, title: String, description: String) -> Element(a) {
     [
       html.span(
         [
-          attribute.class(
-            "font-display text-h3 font-bold group-hover:underline",
-          ),
+          attribute.class("font-display text-h3 font-bold"),
         ],
         [html.text(title)],
       ),
       html.span([attribute.class("text-muted-inverse")], [
         html.text(description),
       ]),
+      html.span(
+        [attribute.class("font-semibold text-accent group-hover:underline")],
+        [
+          html.text(action <> " "),
+          html.span([attribute.aria_hidden(True)], [html.text("→")]),
+        ],
+      ),
     ],
   )
 }
