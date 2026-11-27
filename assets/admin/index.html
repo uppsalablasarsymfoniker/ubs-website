@@ -5,8 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <title>UBS – redigera webbplatsen</title>
+    <style>
+      /* Sveltia has no setting for text on its login page, so this link sits
+         on top of it, above Sveltia's "Powered by" line. */
+      #editor-help {
+        position: fixed;
+        bottom: 4rem;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        text-align: center;
+        font: 15px/1.4 "Source Sans 3", system-ui, sans-serif;
+        color-scheme: light dark;
+      }
+      #editor-help a {
+        color: light-dark(#1466b8, #90caf9);
+      }
+    </style>
   </head>
   <body>
+    <p id="editor-help" hidden>
+      <a href="https://github.com/uppsalablasarsymfoniker/ubs-website/blob/main/docs/editors.md">
+        Ny redaktör? Så får du tillgång
+      </a>
+    </p>
+    <script>
+      // Show the link only while nobody is signed in. Sveltia keeps the
+      // signed-in user under this localStorage key; the observer catches
+      // signing in and out, which re-render the page without reloading it.
+      const help = document.getElementById("editor-help");
+      const update = () => {
+        let signedIn = false;
+        try {
+          signedIn = localStorage.getItem("sveltia-cms.user") !== null;
+        } catch {}
+        help.hidden = signedIn;
+      };
+      update();
+      new MutationObserver(update).observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    </script>
     <!-- Unversioned and without type="module", as Sveltia's docs recommend. -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
   </body>
