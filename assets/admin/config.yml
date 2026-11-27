@@ -27,6 +27,12 @@ slug:
   encoding: ascii
   clean_accents: true
 
+# Shown on the login page and in the header. The guide for new editors is
+# docs/editors.md.
+app_title: UBS webbplats
+logo:
+  src: /images/ubs-logo.svg
+
 media_folder: assets/images/uploads
 public_folder: /images/uploads
 
@@ -53,6 +59,9 @@ collections:
   - name: pages
     label: Sidor
     label_singular: Sida
+    description: >-
+      De fasta sidorna. Varje sida finns på svenska och engelska; byt språk i
+      redigerarens meny. Ändringar syns på webbplatsen efter någon minut.
     i18n: true
     format: toml-frontmatter
     files:
@@ -88,6 +97,10 @@ collections:
   - name: concerts
     label: Konserter
     label_singular: Konsert
+    description: >-
+      Kommande konserter visas på startsidan och under Konserter; passerade
+      flyttas automatiskt till Tidigare konserter. Skriv på svenska; slå på engelska i
+      redigerarens meny när du vill översätta.
     folder: content/concerts
     slug: "{{performances.0 | date('YYYY-MM-DD')}}-{{title}}"
     media_folder: /assets/images/concerts
@@ -103,12 +116,16 @@ collections:
         label: Sammanfattning
         widget: text
         i18n: true
+        hint: En eller två meningar som visas i konsertlistan.
       - name: performances
         label: Föreställningar
         label_singular: Föreställning
         widget: list
         i18n: false
         min: 1
+        hint: >-
+          Lägg till en rad per föreställning. Det första datumet blir en del av
+          filnamnet.
         field: { name: performance, label: Datum och tid, widget: datetime }
       - { name: venue, label: Plats, widget: string, i18n: false }
       - name: ticket_url
@@ -117,12 +134,21 @@ collections:
         type: url
         required: false
         i18n: false
-      - { name: image, label: Bild, widget: image, required: false, i18n: false }
+        hint: Hela adressen, med https://. Lämna tomt om biljetter inte säljs i förväg.
+      - name: image
+        label: Bild
+        widget: image
+        required: false
+        i18n: false
+        hint: Gärna liggande. Bilden görs om till WebP och krymps automatiskt.
       - { name: body, label: Text, widget: markdown, i18n: true }
 
   - name: news
     label: Nyheter
     label_singular: Nyhet
+    description: >-
+      Nyheter visas med den senaste först. Skriv på svenska; slå på engelska i
+      redigerarens meny när du vill översätta.
     folder: content/news
     slug: "{{fields.date}}-{{title}}"
     media_folder: /assets/images/news
@@ -138,12 +164,21 @@ collections:
         label: Sammanfattning
         widget: text
         i18n: true
+        hint: En eller två meningar som visas i nyhetslistan.
       - { name: date, label: Datum, widget: datetime, type: date, i18n: false }
-      - { name: image, label: Bild, widget: image, required: false, i18n: false }
+      - name: image
+        label: Bild
+        widget: image
+        required: false
+        i18n: false
+        hint: Bilden görs om till WebP och krymps automatiskt.
       - { name: body, label: Text, widget: markdown, i18n: true }
 
   - name: data
     label: Inställningar
+    description: >-
+      Medlemslistan och föreningens kontaktuppgifter. Lägg bara in medlemmar
+      som har sagt ja till att synas på webbplatsen.
     format: toml
     files:
       - name: members
@@ -176,7 +211,11 @@ collections:
                   - { value: tuba, label: Tuba }
                   - { value: double_bass, label: Kontrabas }
                   - { value: percussion, label: Slagverk }
-              - { name: role, label: Roll, widget: string, required: false }
+              - name: role
+                label: Roll
+                widget: string
+                required: false
+                hint: Till exempel ordförande eller stämledare. Lämna tomt annars.
       - name: settings
         label: Kontaktuppgifter
         file: content/settings.toml
