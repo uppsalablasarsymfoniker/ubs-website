@@ -29,7 +29,7 @@ slug:
 
 # Shown on the login page and in the header. The guide for new editors is
 # docs/editors.md.
-app_title: UBS webbplats
+app_title: Innehållshanteringssystem
 logo:
   src: /images/ubs-logo.svg
 
