@@ -15,6 +15,7 @@ deployed from `main`. Cloudflare account: "Uppsala Blåsarsymfoniker"; the
 | Why it is that way | `docs/decisions/NNNN-*.md`, one record per decision |
 | What's done, next, and blocked | GitHub issues, grouped by milestone |
 | Colours, type, logo, spacing | `docs/ubs-profile.html` (source of truth) |
+| How a new CMS editor gets access | `docs/editors.md` (Swedish, for editors) |
 
 ## Status and work
 

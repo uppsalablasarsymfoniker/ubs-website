@@ -23,7 +23,8 @@ Cloudflare (`.github/workflows/deploy.yml`, `wrangler.jsonc`).
 Content lives in `content/`: pages, concerts and news as `<slug>.sv.md` /
 `<slug>.en.md` files, plus `members.toml` and `settings.toml`. Edit the files
 directly, or use Sveltia CMS at `/admin` (configured in
-`assets/admin/config.yml`), which commits to `main`.
+`assets/admin/config.yml`), which commits to `main`. New editors:
+[how to get access](docs/editors.md) (in Swedish).
 
 ## Docs
 
