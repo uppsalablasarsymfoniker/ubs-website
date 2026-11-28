@@ -322,14 +322,11 @@ The member list is public personal data, so
 
 ## Forms
 
-Static hosting has no server to receive a form post. Options, simplest first:
-
-1. `mailto:` links for contact and booking.
-2. Embedded or linked Google Forms, as already used for the conductor search.
-3. A form service (e.g. Formspree) or a small serverless function, if a styled
-   on-site form is needed.
-
-**Proposed:** 1 and 2 ([0013](decisions/0013-forms-without-a-server.md)).
+Static hosting has no server to receive a form post, so visitors reach the
+orchestra through `mailto:` links for contact and booking, and through linked
+Google Forms where a form is needed, as for the conductor search. No form
+service or serverless function
+([0013](decisions/0013-forms-without-a-server.md)).
 
 ## Build, test, deploy
 

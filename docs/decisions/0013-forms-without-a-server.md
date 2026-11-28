@@ -1,6 +1,6 @@
 # 0013. Forms without a server
 
-Status: Proposed · 2026-11-25
+Status: Accepted · 2026-11-28
 
 ## Context
 
