@@ -16,6 +16,7 @@ import ubs_website/route.{type Route}
 import ubs_website/site.{type Site}
 import ubs_website/view/concert as concert_view
 import ubs_website/view/document.{type Meta, Meta}
+import ubs_website/view/icon
 import ubs_website/view/news as news_view
 
 // VIEW ------------------------------------------------------------------------
@@ -117,8 +118,14 @@ pub fn contact_details(settings: Settings, language: Language) -> Element(a) {
           ])
         }),
       ),
-      detail("Facebook", option.map(settings.facebook, account_link(_, ""))),
-      detail("Instagram", option.map(settings.instagram, account_link(_, "@"))),
+      detail(
+        "Facebook",
+        option.map(settings.facebook, account_link(_, "", icon.facebook)),
+      ),
+      detail(
+        "Instagram",
+        option.map(settings.instagram, account_link(_, "@", icon.instagram)),
+      ),
     ],
   )
 }
@@ -134,10 +141,18 @@ fn detail(label: String, value: Option(Element(a))) -> Element(a) {
   }
 }
 
-fn account_link(url: String, prefix: String) -> Element(a) {
-  html.a([attribute.href(url), attribute.class("text-primary underline")], [
-    html.text(account_name(url, prefix)),
-  ])
+fn account_link(
+  url: String,
+  prefix: String,
+  icon: fn(String) -> Element(a),
+) -> Element(a) {
+  html.a(
+    [
+      attribute.href(url),
+      attribute.class("inline-flex items-center gap-2 text-primary underline"),
+    ],
+    [icon("size-5"), html.text(account_name(url, prefix))],
+  )
 }
 
 /// The account name from a profile URL: its last path segment, so

@@ -104,6 +104,13 @@ Files live in `assets/images/` and are served from `images/` under the site's ba
 - `alt` is the orchestra name, not "UBS".
 - The full-color logo is a single UBS Red fill: 2.69:1 on black, below even the 3:1 floor for graphics. Never put it on a dark surface.
 
+## Icons (profile §09)
+
+Inline SVG from `src/ubs_website/view/icon.gleam`, in `currentColor`, so an icon takes its link's color and hover color. Never a platform's own colors (Facebook blue, the Instagram gradient).
+
+- `size-5` (20px) beside text, `aria-hidden`.
+- `size-6` (24px) when alone, inside a tap area of at least `size-10` (40px), and the link carries an `aria-label` naming where it leads.
+
 ## Radius
 
 Three steps, mapped onto Tailwind's radius utilities: `rounded-sm` 4px (buttons, inputs, tabs) · `rounded-md` 6px (badges, chips, insets) · `rounded-lg` 10px (cards, panels). `rounded-lg` is overridden from Tailwind's 8px default in `src/app.css`. Other radius utilities are off-scale.

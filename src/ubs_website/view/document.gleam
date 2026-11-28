@@ -9,6 +9,7 @@ import ubs_website/data/language.{type Language, English, Swedish}
 import ubs_website/data/settings.{type Settings}
 import ubs_website/route.{type Route}
 import ubs_website/site.{type Site}
+import ubs_website/view/icon
 
 // TYPES -----------------------------------------------------------------------
 
@@ -450,9 +451,11 @@ fn language_switch(
   language: Language,
   current: Option(Route),
 ) -> Element(a) {
-  let #(other, label) = case language {
-    Swedish -> #(English, "English")
-    English -> #(Swedish, "Svenska")
+  // The visible code begins the accessible name, so speech users can say
+  // what they see.
+  let #(other, name, code) = case language {
+    Swedish -> #(English, "English", "EN")
+    English -> #(Swedish, "Svenska", "SV")
   }
 
   html.a(
@@ -460,11 +463,13 @@ fn language_switch(
       attribute.href(route.href(site, option.unwrap(current, route.Home), other)),
       attribute.lang(language.code(other)),
       attribute.attribute("hreflang", language.code(other)),
+      attribute.attribute("aria-label", name),
+      attribute.attribute("title", name),
       attribute.class(
-        "rounded-sm border border-base-300 px-3 py-1 text-small hover:border-primary hover:text-primary",
+        "inline-flex min-h-10 items-center gap-1 rounded-sm px-2 text-small font-bold hover:text-primary",
       ),
     ],
-    [html.text(label)],
+    [icon.globe("size-5"), html.text(code)],
   )
 }
 
@@ -503,20 +508,39 @@ fn footer(site: Site, settings: Settings, heading: String) -> Element(a) {
             ],
             [html.text(settings.email)],
           ),
-          social_link(settings.facebook, "Facebook"),
-          social_link(settings.instagram, "Instagram"),
+          case settings.facebook, settings.instagram {
+            None, None -> element.none()
+            facebook, instagram ->
+              // Pulled left so the first icon lines up with the text above,
+              // keeping its full tap area.
+              html.div([attribute.class("-ml-2 flex")], [
+                social_link(facebook, "Facebook", icon.facebook),
+                social_link(instagram, "Instagram", icon.instagram),
+              ])
+          },
         ]),
       ],
     ),
   ])
 }
 
-fn social_link(url: Option(String), label: String) -> Element(a) {
+fn social_link(
+  url: Option(String),
+  label: String,
+  icon: fn(String) -> Element(a),
+) -> Element(a) {
   case url {
     Some(url) ->
-      html.a([attribute.href(url), attribute.class("hover:underline")], [
-        html.text(label),
-      ])
+      html.a(
+        [
+          attribute.href(url),
+          attribute.attribute("aria-label", label),
+          attribute.class(
+            "inline-flex size-10 items-center justify-center hover:text-accent",
+          ),
+        ],
+        [icon("size-6")],
+      )
     None -> element.none()
   }
 }

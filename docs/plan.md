@@ -305,8 +305,11 @@ headings, visible focus, `lang` on every page and on Swedish fallbacks.
 
 ### Social media icons
 
-Proposed: Facebook and Instagram get their icons in the footer and on the
-contact page ([0015](decisions/0015-social-media-icons.md)).
+Facebook and Instagram show their icons, in the colour of the link around
+them: icons only in the footer, the icon beside the account name on the
+contact page ([0015](decisions/0015-social-media-icons.md)). The rules are in
+the profile's Icons section. The language switch is a globe with the other
+language's code (EN / SV).
 
 ## Members
 

@@ -1,6 +1,6 @@
 # 0015. Social media icons
 
-Status: Proposed · 2026-11-26
+Status: Accepted · 2026-11-28
 
 ## Context
 
