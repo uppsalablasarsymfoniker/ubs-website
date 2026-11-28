@@ -8,7 +8,7 @@ place as that changes. Why each choice was made is in `docs/decisions/`;
 progress and open work are GitHub issues, grouped by milestone. Preview:
 https://website.uppsalablasarsymfoniker.workers.dev/
 
-Repository: `uppsalablasarsymfoniker/ubs-website` on GitHub.
+Repository: `uppsalablasarsymfoniker/website` on GitHub.
 
 ## Goals
 

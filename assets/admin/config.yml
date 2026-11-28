@@ -6,7 +6,7 @@
 
 backend:
   name: github
-  repo: uppsalablasarsymfoniker/ubs-website
+  repo: uppsalablasarsymfoniker/website
   branch: main
   # "Sign in with GitHub" goes through this Worker (workers/cms-auth/).
   base_url: https://sveltia-cms-auth.uppsalablasarsymfoniker.workers.dev
